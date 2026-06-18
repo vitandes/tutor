@@ -1,0 +1,176 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { temasPorGrado, Grado } from "@/lib/curriculo";
+import {
+  obtenerCuenta,
+  puedePreguntar,
+  registrarPregunta,
+  registrarLogro,
+  quedanGratis,
+  estaSuscrito,
+  suscribir,
+} from "@/lib/store";
+
+interface Msg { role: "user" | "assistant"; content: string; img?: string; }
+interface Ejercicio { enunciado: string; pista: string; }
+
+export default function TutorPage() {
+  const router = useRouter();
+  const [grado, setGrado] = useState<Grado | null>(null);
+  const [hijo, setHijo] = useState("");
+  const [temaId, setTemaId] = useState<string | null>(null);
+  const [temaNombre, setTemaNombre] = useState("");
+  const [mensajes, setMensajes] = useState<Msg[]>([]);
+  const [texto, setTexto] = useState("");
+  const [img, setImg] = useState<{ data: string; tipo: string; preview: string } | null>(null);
+  const [cargando, setCargando] = useState(false);
+  const [muro, setMuro] = useState(false);
+  const [ejercicios, setEjercicios] = useState<Ejercicio[]>([]);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const c = obtenerCuenta();
+    if (!c) { router.push("/configurar"); return; }
+    setGrado(c.grado as Grado);
+    setHijo(c.hijo);
+  }, [router]);
+
+  function elegirTema(id: string, nombre: string) {
+    setTemaId(id);
+    setTemaNombre(nombre);
+    setMensajes([{ role: "assistant", content: `¡Hola ${hijo}! Vamos con ${nombre}. Cuéntame tu ejercicio o tómale una foto. ¿Qué has intentado?` }]);
+    setEjercicios([]);
+  }
+
+  function leerFoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const r = reader.result as string;
+      setImg({ data: r.split(",")[1], tipo: file.type, preview: r });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function enviar() {
+    if (!texto.trim() && !img) return;
+    if (!puedePreguntar()) { setMuro(true); return; }
+    const nuevo: Msg = { role: "user", content: texto.trim(), img: img?.preview };
+    const historia = [...mensajes, nuevo];
+    setMensajes(historia);
+    setTexto("");
+    const foto = img; setImg(null);
+    setCargando(true);
+    registrarPregunta(temaId!, temaNombre);
+    try {
+      const resp = await fetch("/api/tutor", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          grado, temaId,
+          messages: historia.map((m) => ({ role: m.role, content: m.content })),
+          imagenBase64: foto?.data, imagenTipo: foto?.tipo,
+        }),
+      });
+      const data = await resp.json();
+      setMensajes((m) => [...m, { role: "assistant", content: data.respuesta || data.error || "Ups, intenta de nuevo." }]);
+    } catch {
+      setMensajes((m) => [...m, { role: "assistant", content: "No pude responder. Revisa tu conexión." }]);
+    } finally { setCargando(false); }
+  }
+
+  function logre() {
+    registrarLogro(temaId!);
+    setMensajes((m) => [...m, { role: "assistant", content: "¡Excelente! 🎉 Lo lograste tú solo. Eso es aprender de verdad." }]);
+  }
+
+  async function generarPractica() {
+    setCargando(true);
+    try {
+      const resp = await fetch("/api/practica", {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ grado, temaId }),
+      });
+      const data = await resp.json();
+      setEjercicios(data.ejercicios || []);
+    } finally { setCargando(false); }
+  }
+
+  if (!grado) return <main className="contenedor"><p className="nota">Cargando…</p></main>;
+
+  if (!temaId) {
+    return (
+      <main className="contenedor">
+        <Link href="/" className="nota">← Inicio</Link>
+        <h1 style={{ fontSize: 28, margin: "12px 0 18px" }}>
+          {hijo}, ¿con qué <span className="marca">tema</span> necesitas ayuda?
+        </h1>
+        <div className="fila">
+          {temasPorGrado(grado).map((t) => (
+            <button key={t.id} className="chip" onClick={() => elegirTema(t.id, t.nombre)}>{t.nombre}</button>
+          ))}
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="contenedor">
+      <div className="fila" style={{ justifyContent: "space-between" }}>
+        <button className="nota" onClick={() => setTemaId(null)} style={{ background: "none", border: "none", cursor: "pointer" }}>← {temaNombre}</button>
+        <span className="racha">{estaSuscrito() ? "★ Plan activo" : `${quedanGratis()} gratis`}</span>
+      </div>
+
+      <div className="chat">
+        {mensajes.map((m, i) => (
+          <div key={i} className={`burbuja ${m.role === "assistant" ? "tutor" : "nino"}`}>
+            {m.img && <img src={m.img} className="thumb" alt="tarea" />}
+            {m.content}
+          </div>
+        ))}
+        {cargando && <div className="burbuja tutor">Pensando…</div>}
+      </div>
+
+      {ejercicios.length > 0 && (
+        <div className="tarjeta" style={{ marginBottom: 16 }}>
+          <h3 style={{ fontSize: 18, marginBottom: 8 }}>Practica tú</h3>
+          {ejercicios.map((e, i) => (
+            <div className="ejercicio" key={i}>
+              <p>{e.enunciado}</p>
+              <p className="pista">Pista: {e.pista}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {muro ? (
+        <div className="tarjeta muro">
+          <h3 style={{ fontSize: 22, marginBottom: 8 }}>Se acabaron las preguntas gratis</h3>
+          <p className="nota" style={{ marginBottom: 16 }}>Activa el plan para preguntas ilimitadas y el reporte de avance.</p>
+          <button className="btn coral" onClick={() => { suscribir(); setMuro(false); }}>Activar plan · $29.900/mes</button>
+          <p className="nota" style={{ marginTop: 10 }}>(Demo: aquí va el pago con Nequi / PSE / tarjeta)</p>
+        </div>
+      ) : (
+        <>
+          {img && <img src={img.preview} className="thumb" alt="vista previa" />}
+          <div className="entrada">
+            <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={leerFoto} />
+            <button className="iconbtn" onClick={() => fileRef.current?.click()} title="Foto de la tarea">📷</button>
+            <textarea rows={1} placeholder="Escribe lo que intentaste…" value={texto}
+              onChange={(e) => setTexto(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }} />
+            <button className="btn coral" onClick={enviar} disabled={cargando}>Enviar</button>
+          </div>
+          <div className="fila" style={{ marginTop: 12 }}>
+            <button className="btn" onClick={logre} disabled={cargando}>¡Lo logré! 🎉</button>
+            <button className="btn fantasma" onClick={generarPractica} disabled={cargando}>Dame práctica</button>
+          </div>
+        </>
+      )}
+    </main>
+  );
+}
