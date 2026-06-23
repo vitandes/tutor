@@ -131,6 +131,82 @@ a {
   color: var(--papel);
 }
 
+/* ── Fracción visual ── */
+.fraccion {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 1.1;
+  margin: 0 4px;
+  font-family: var(--display);
+  font-weight: 700;
+}
+.frac-num {
+  border-bottom: 2px solid currentColor;
+  padding: 0 4px;
+  font-size: 0.82em;
+  min-width: 16px;
+  text-align: center;
+  line-height: 1.4;
+}
+.frac-den {
+  padding: 0 4px;
+  font-size: 0.82em;
+  min-width: 16px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ── Elementos estructurados del chat ── */
+.chat-ruta {
+  display: block;
+  background: var(--marcador);
+  border: 2px solid var(--tinta);
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-family: var(--display);
+  font-size: 14px;
+  margin: 2px 0 4px;
+}
+.chat-paso {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 14px;
+}
+.chat-paso-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--tinta);
+  color: var(--papel);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.chat-inicio {
+  display: block;
+  border-left: 3px solid var(--coral);
+  padding: 4px 10px;
+  font-size: 15px;
+  margin: 4px 0;
+  font-family: var(--display);
+}
+.chat-ok {
+  display: block;
+  color: var(--verde);
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 2px 0;
+}
+
 /* Chat */
 .chat {
   display: flex;

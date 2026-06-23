@@ -2,11 +2,21 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { obtenerCuenta, Cuenta } from "@/lib/store";
+import { SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
+
+interface Perfil { nombre_hijo: string; grado: string }
 
 export default function Home() {
-  const [cuenta, setCuenta] = useState<Cuenta | null>(null);
-  useEffect(() => setCuenta(obtenerCuenta()), []);
+  const { isSignedIn, user } = useUser();
+  const [perfil, setPerfil] = useState<Perfil | null>(null);
+
+  useEffect(() => {
+    if (!isSignedIn) { setPerfil(null); return; }
+    fetch("/api/perfil")
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => d?.onboarding_completado ? setPerfil(d) : setPerfil(null))
+      .catch(() => setPerfil(null));
+  }, [isSignedIn]);
 
   return (
     <main className="contenedor">
@@ -20,26 +30,37 @@ export default function Home() {
         tu celular en qué va mejorando y qué le cuesta.
       </p>
 
-      {!cuenta ? (
+      {!isSignedIn ? (
         <div className="fila cta-hero" style={{ marginTop: 28 }}>
-          <Link href="/configurar">
-            <span className="btn coral">Crear cuenta de familia →</span>
-          </Link>
+          <SignUpButton forceRedirectUrl="/configurar">
+            <button className="btn coral">Crear cuenta de familia →</button>
+          </SignUpButton>
           <a href="#planes">
             <span className="btn fantasma">Ver planes</span>
           </a>
         </div>
-      ) : (
+      ) : perfil ? (
         <>
           <p style={{ marginTop: 24, fontFamily: "var(--display)", fontWeight: 600 }}>
-            Hola, {cuenta.padre} 👋
+            Hola, {user?.firstName ?? "familia"} 👋
           </p>
           <div className="fila cta-hero" style={{ marginTop: 12, gap: 16 }}>
             <Link href="/tutor">
-              <span className="btn coral">{cuenta.hijo} va a estudiar →</span>
+              <span className="btn coral">{perfil.nombre_hijo} va a estudiar →</span>
             </Link>
             <Link href="/padres">
               <span className="btn fantasma">Ver su avance →</span>
+            </Link>
+          </div>
+        </>
+      ) : (
+        <>
+          <p style={{ marginTop: 24, fontFamily: "var(--display)", fontWeight: 600 }}>
+            Hola, {user?.firstName ?? "familia"} 👋 — falta un paso
+          </p>
+          <div className="fila cta-hero" style={{ marginTop: 12, gap: 16 }}>
+            <Link href="/configurar">
+              <span className="btn coral">Completar configuración →</span>
             </Link>
           </div>
         </>
@@ -78,35 +99,23 @@ export default function Home() {
         <div className="rejilla">
           <div className="beneficio">
             <span className="emoji">😣</span>
-            <h4>“No sé cómo explicarle”</h4>
-            <p>
-              Las mates de hoy se enseñan distinto a como las aprendiste tú. Acabáis los
-              dos frustrados.
-            </p>
+            <h4>"No sé cómo explicarle"</h4>
+            <p>Las mates de hoy se enseñan distinto a como las aprendiste tú. Acabáis los dos frustrados.</p>
           </div>
           <div className="beneficio">
             <span className="emoji">⏰</span>
-            <h4>“No tengo tiempo cada tarde”</h4>
-            <p>
-              Entre el trabajo y la casa es imposible sentarse una hora a revisar cada
-              ejercicio.
-            </p>
+            <h4>"No tengo tiempo cada tarde"</h4>
+            <p>Entre el trabajo y la casa es imposible sentarse una hora a revisar cada ejercicio.</p>
           </div>
           <div className="beneficio">
             <span className="emoji">📱</span>
-            <h4>“Copia la respuesta y ya”</h4>
-            <p>
-              Las apps que dan el resultado hecho no enseñan: tu hijo aprueba el examen
-              pero no aprende.
-            </p>
+            <h4>"Copia la respuesta y ya"</h4>
+            <p>Las apps que dan el resultado hecho no enseñan: tu hijo aprueba el examen pero no aprende.</p>
           </div>
           <div className="beneficio">
             <span className="emoji">🤷</span>
-            <h4>“No sé en qué falla”</h4>
-            <p>
-              Te enteras de que algo va mal cuando llega la nota, y ya es tarde para
-              reforzar.
-            </p>
+            <h4>"No sé en qué falla"</h4>
+            <p>Te enteras de que algo va mal cuando llega la nota, y ya es tarde para reforzar.</p>
           </div>
         </div>
       </section>
@@ -115,8 +124,7 @@ export default function Home() {
       <section className="seccion">
         <h2 className="seccion-titulo">Cómo funciona</h2>
         <p className="seccion-intro">
-          Pensado para que tu hijo lo use solo, en menos de un minuto, sin que tengas que
-          estar encima.
+          Pensado para que tu hijo lo use solo, en menos de un minuto, sin que tengas que estar encima.
         </p>
         <div className="tarjeta">
           <div className="paso">
@@ -130,30 +138,21 @@ export default function Home() {
             <div className="nro">2</div>
             <div>
               <h4>El tutor lo guía con pistas</h4>
-              <p>
-                Le hace preguntas y le da pistas para que llegue solo a la respuesta. Nunca
-                se la regala.
-              </p>
+              <p>Le hace preguntas y le da pistas para que llegue solo a la respuesta. Nunca se la regala.</p>
             </div>
           </div>
           <div className="paso">
             <div className="nro">3</div>
             <div>
               <h4>Practica hasta dominarlo</h4>
-              <p>
-                Cuando entiende, marca “¡Lo logré!” y resuelve ejercicios similares para
-                afianzar el tema.
-              </p>
+              <p>Cuando entiende, marca "¡Lo logré!" y resuelve ejercicios similares para afianzar el tema.</p>
             </div>
           </div>
           <div className="paso">
             <div className="nro">4</div>
             <div>
               <h4>Tú recibes su avance</h4>
-              <p>
-                Te llega un resumen claro por WhatsApp: qué practicó, qué domina y qué
-                necesita reforzar.
-              </p>
+              <p>Te llega un resumen claro por WhatsApp: qué practicó, qué domina y qué necesita reforzar.</p>
             </div>
           </div>
         </div>
@@ -163,8 +162,7 @@ export default function Home() {
       <section className="seccion">
         <h2 className="seccion-titulo">Hecho para darte tranquilidad</h2>
         <p className="seccion-intro">
-          No es solo una app para el niño: es tu ventana a su aprendizaje, sin tener que
-          sentarte cada tarde con él.
+          No es solo una app para el niño: es tu ventana a su aprendizaje, sin tener que sentarte cada tarde con él.
         </p>
         <div className="rejilla">
           <div className="beneficio">
@@ -203,64 +201,38 @@ export default function Home() {
       {/* ====== TESTIMONIOS ====== */}
       <section className="seccion">
         <h2 className="seccion-titulo">Lo que dicen otras familias</h2>
-        <p className="seccion-intro">
-          Padres y madres que pasaron de pelear con la tarea a verla resuelta sola.
-        </p>
+        <p className="seccion-intro">Padres y madres que pasaron de pelear con la tarea a verla resuelta sola.</p>
         <div className="testimonios">
           <div className="testimonio">
             <div className="estrellas">★★★★★</div>
-            <p>
-              “Mi hija pasó de llorar con las divisiones a explicármelas a mí. Lo mejor es
-              que entiende, no copia.”
-            </p>
+            <p>"Mi hija pasó de llorar con las divisiones a explicármelas a mí. Lo mejor es que entiende, no copia."</p>
             <div className="autor">
               <div className="avatar">M</div>
-              <div>
-                <b>Marta G.</b>
-                <small>mamá de Lucía, 4° primaria</small>
-              </div>
+              <div><b>Marta G.</b><small>mamá de Lucía, 4° primaria</small></div>
             </div>
           </div>
           <div className="testimonio">
             <div className="estrellas">★★★★★</div>
-            <p>
-              “Trabajo hasta tarde y no podía ayudarle. Ahora hace la tarea solo y yo recibo
-              el resumen en el móvil. Impagable.”
-            </p>
+            <p>"Trabajo hasta tarde y no podía ayudarle. Ahora hace la tarea solo y yo recibo el resumen en el móvil. Impagable."</p>
             <div className="autor">
               <div className="avatar">J</div>
-              <div>
-                <b>Javier R.</b>
-                <small>papá de Mateo, 5° primaria</small>
-              </div>
+              <div><b>Javier R.</b><small>papá de Mateo, 5° primaria</small></div>
             </div>
           </div>
           <div className="testimonio">
             <div className="estrellas">★★★★★</div>
-            <p>
-              “Subió de un 5 a un 8 en mate en un trimestre. Pero lo que más valoro es que
-              ya no le tiene miedo.”
-            </p>
+            <p>"Subió de un 5 a un 8 en mate en un trimestre. Pero lo que más valoro es que ya no le tiene miedo."</p>
             <div className="autor">
               <div className="avatar">C</div>
-              <div>
-                <b>Carolina P.</b>
-                <small>mamá de Tomás, 3° primaria</small>
-              </div>
+              <div><b>Carolina P.</b><small>mamá de Tomás, 3° primaria</small></div>
             </div>
           </div>
           <div className="testimonio">
             <div className="estrellas">★★★★★</div>
-            <p>
-              “Probé otras apps que daban la respuesta y no servían. Esta lo hace pensar.
-              Esa es toda la diferencia.”
-            </p>
+            <p>"Probé otras apps que daban la respuesta y no servían. Esta lo hace pensar. Esa es toda la diferencia."</p>
             <div className="autor">
               <div className="avatar">A</div>
-              <div>
-                <b>Andrés M.</b>
-                <small>papá de Sofía, 4° primaria</small>
-              </div>
+              <div><b>Andrés M.</b><small>papá de Sofía, 4° primaria</small></div>
             </div>
           </div>
         </div>
@@ -270,31 +242,30 @@ export default function Home() {
       <section className="seccion" id="planes">
         <h2 className="seccion-titulo">Planes para tu familia</h2>
         <p className="seccion-intro">
-          Empieza con 7 días gratis. Sin permanencia, cancela cuando quieras. Menos que una
-          hora de clases particulares.
+          Empieza con 7 días gratis. Sin permanencia, cancela cuando quieras. Menos que una hora de clases particulares.
         </p>
         <div className="planes">
           <div className="plan">
             <h4>Prueba</h4>
-            <div className="precio">
-              Gratis<small> /7 días</small>
-            </div>
+            <div className="precio">Gratis<small> /7 días</small></div>
             <p className="desc">Para conocer cómo funciona sin compromiso.</p>
             <ul>
               <li>Tutor guiado paso a paso</li>
               <li>5 tareas al día</li>
               <li>Sin tarjeta para empezar</li>
             </ul>
-            <Link href="/configurar">
-              <span className="btn fantasma">Empezar gratis</span>
-            </Link>
+            {isSignedIn ? (
+              <Link href="/tutor"><span className="btn fantasma">Ir al tutor</span></Link>
+            ) : (
+              <SignUpButton forceRedirectUrl="/configurar">
+                <button className="btn fantasma">Empezar gratis</button>
+              </SignUpButton>
+            )}
           </div>
 
           <div className="plan">
             <h4>Mensual</h4>
-            <div className="precio">
-              $39.900<small> /mes</small>
-            </div>
+            <div className="precio">$39.900<small> /mes</small></div>
             <p className="desc">Toda la app, mes a mes.</p>
             <ul>
               <li>Tareas ilimitadas</li>
@@ -302,17 +273,19 @@ export default function Home() {
               <li>Práctica adaptada por tema</li>
               <li>Todo el currículo 3°–5°</li>
             </ul>
-            <Link href="/configurar">
-              <span className="btn fantasma">Elegir mensual</span>
-            </Link>
+            {isSignedIn ? (
+              <Link href="/api/checkout?plan=mensual"><span className="btn fantasma">Elegir mensual</span></Link>
+            ) : (
+              <SignUpButton forceRedirectUrl="/configurar">
+                <button className="btn fantasma">Elegir mensual</button>
+              </SignUpButton>
+            )}
           </div>
 
           <div className="plan destacado">
             <span className="etiqueta">Ahorra 58%</span>
             <h4>Anual</h4>
-            <div className="precio">
-              $199.999<small> /año</small>
-            </div>
+            <div className="precio">$199.999<small> /año</small></div>
             <p className="desc">Equivale a $16.667/mes. Paga una vez al año.</p>
             <ul>
               <li>Todo lo del plan Mensual</li>
@@ -320,9 +293,13 @@ export default function Home() {
               <li>Panel de avance del hijo</li>
               <li>Soporte prioritario</li>
             </ul>
-            <Link href="/configurar">
-              <span className="btn coral">Empezar gratis →</span>
-            </Link>
+            {isSignedIn ? (
+              <Link href="/api/checkout?plan=anual"><span className="btn coral">Elegir anual →</span></Link>
+            ) : (
+              <SignUpButton forceRedirectUrl="/configurar">
+                <button className="btn coral">Empezar gratis →</button>
+              </SignUpButton>
+            )}
           </div>
         </div>
         <p className="nota" style={{ marginTop: 16, textAlign: "center" }}>
@@ -336,59 +313,41 @@ export default function Home() {
         <div className="faq">
           <details>
             <summary>¿De verdad no le da la respuesta?</summary>
-            <p>
-              Exacto. El tutor está diseñado para guiar con preguntas y pistas hasta que tu
-              hijo llega solo al resultado. Aprende el método, no memoriza el número.
-            </p>
+            <p>Exacto. El tutor está diseñado para guiar con preguntas y pistas hasta que tu hijo llega solo al resultado. Aprende el método, no memoriza el número.</p>
           </details>
           <details>
             <summary>¿Necesita que yo esté presente?</summary>
-            <p>
-              No. Está pensado para que el niño lo use solo. Tú recibes un resumen de su
-              avance por WhatsApp y puedes revisar el panel cuando quieras.
-            </p>
+            <p>No. Está pensado para que el niño lo use solo. Tú recibes un resumen de su avance por WhatsApp y puedes revisar el panel cuando quieras.</p>
           </details>
           <details>
             <summary>¿Para qué edades y cursos sirve?</summary>
-            <p>
-              Matemáticas de 3°, 4° y 5° de primaria, con contenido alineado al currículo de
-              cada curso. Pronto añadiremos más cursos.
-            </p>
+            <p>Matemáticas de 3°, 4° y 5° de primaria, con contenido alineado al currículo de cada curso. Pronto añadiremos más cursos.</p>
           </details>
           <details>
             <summary>¿Es seguro para mi hijo?</summary>
-            <p>
-              Totalmente. Es un entorno cerrado solo de matemáticas: sin publicidad, sin
-              chats con desconocidos y sin contenido externo.
-            </p>
+            <p>Totalmente. Es un entorno cerrado solo de matemáticas: sin publicidad, sin chats con desconocidos y sin contenido externo.</p>
           </details>
           <details>
             <summary>¿Puedo cancelar cuando quiera?</summary>
-            <p>
-              Sí, sin permanencia ni penalizaciones. Además tienes 7 días de prueba gratis y
-              garantía de devolución de 30 días.
-            </p>
+            <p>Sí, sin permanencia ni penalizaciones. Además tienes 7 días de prueba gratis y garantía de devolución de 30 días.</p>
           </details>
         </div>
       </section>
 
       {/* ====== CTA FINAL ====== */}
       <div className="cta-final">
-        <h2>
-          Que la tarea deje de ser una <span className="marca">pelea</span>.
-        </h2>
-        <p>
-          Dale a tu hijo un tutor que le enseña a pensar, y a ti la tranquilidad de ver su
-          progreso. Empieza gratis hoy.
-        </p>
-        <Link href="/configurar">
-          <span className="btn coral">Crear cuenta de familia →</span>
-        </Link>
+        <h2>Que la tarea deje de ser una <span className="marca">pelea</span>.</h2>
+        <p>Dale a tu hijo un tutor que le enseña a pensar, y a ti la tranquilidad de ver su progreso. Empieza gratis hoy.</p>
+        {isSignedIn ? (
+          <Link href="/tutor"><span className="btn coral">Ir al tutor →</span></Link>
+        ) : (
+          <SignUpButton forceRedirectUrl="/configurar">
+            <button className="btn coral">Crear cuenta de familia →</button>
+          </SignUpButton>
+        )}
       </div>
 
-      <p className="pie">
-        Tutor de Tareas · Matemáticas de primaria · Hecho con cariño para las familias 💛
-      </p>
+      <p className="pie">Tutor de Tareas · Matemáticas de primaria · Hecho con cariño para las familias 💛</p>
     </main>
   );
 }

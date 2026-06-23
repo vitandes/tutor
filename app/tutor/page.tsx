@@ -3,24 +3,22 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { temasPorGrado, Grado } from "@/lib/curriculo";
-import {
-  obtenerCuenta,
-  puedePreguntar,
-  registrarPregunta,
-  registrarLogro,
-  quedanGratis,
-  estaSuscrito,
-  suscribir,
-} from "@/lib/store";
+import { MensajeChat } from "@/app/components/MensajeChat";
 
 interface Msg { role: "user" | "assistant"; content: string; img?: string; }
 interface Ejercicio { enunciado: string; pista: string; }
+interface Perfil { nombre_hijo: string; grado: string; plan: string; onboarding_completado: boolean; }
+
+const LIMITE_GRATIS = 5;
 
 export default function TutorPage() {
   const router = useRouter();
+  const { isLoaded, isSignedIn } = useUser();
+
+  const [perfil, setPerfil] = useState<Perfil | null>(null);
   const [grado, setGrado] = useState<Grado | null>(null);
-  const [hijo, setHijo] = useState("");
   const [temaId, setTemaId] = useState<string | null>(null);
   const [temaNombre, setTemaNombre] = useState("");
   const [mensajes, setMensajes] = useState<Msg[]>([]);
@@ -29,19 +27,42 @@ export default function TutorPage() {
   const [cargando, setCargando] = useState(false);
   const [muro, setMuro] = useState(false);
   const [ejercicios, setEjercicios] = useState<Ejercicio[]>([]);
+  // Contador local de preguntas gratis (se resetea al recargar — la BD es la fuente de verdad para el plan)
+  const preguntasRef = useRef(0);
   const fileRef = useRef<HTMLInputElement>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const c = obtenerCuenta();
-    if (!c) { router.push("/configurar"); return; }
-    setGrado(c.grado as Grado);
-    setHijo(c.hijo);
-  }, [router]);
+    if (!isLoaded) return;
+    if (!isSignedIn) { router.push("/sign-in"); return; }
+    fetch("/api/perfil")
+      .then((r) => r.ok ? r.json() : null)
+      .then((d: Perfil | null) => {
+        if (!d || !d.onboarding_completado) { router.push("/configurar"); return; }
+        setPerfil(d);
+        setGrado(d.grado as Grado);
+      });
+  }, [isLoaded, isSignedIn, router]);
+
+  // Scroll al último mensaje
+  useEffect(() => {
+    if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
+  }, [mensajes]);
+
+  function esPro() { return perfil?.plan === "mensual" || perfil?.plan === "anual"; }
+
+  function puedePreguntar() {
+    return esPro() || preguntasRef.current < LIMITE_GRATIS;
+  }
+
+  function quedanGratis() {
+    return Math.max(0, LIMITE_GRATIS - preguntasRef.current);
+  }
 
   function elegirTema(id: string, nombre: string) {
     setTemaId(id);
     setTemaNombre(nombre);
-    setMensajes([{ role: "assistant", content: `¡Hola ${hijo}! Vamos con ${nombre}. Cuéntame tu ejercicio o tómale una foto. ¿Qué has intentado?` }]);
+    setMensajes([{ role: "assistant", content: `¡Hola ${perfil?.nombre_hijo ?? ""}! Vamos con ${nombre}. Cuéntame tu ejercicio o tómale una foto. ¿Qué has intentado?` }]);
     setEjercicios([]);
   }
 
@@ -65,7 +86,15 @@ export default function TutorPage() {
     setTexto("");
     const foto = img; setImg(null);
     setCargando(true);
-    registrarPregunta(temaId!, temaNombre);
+    preguntasRef.current += 1;
+
+    // Registrar pregunta en BD (fire and forget)
+    fetch("/api/progreso", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ tema_id: temaId, tema_nombre: temaNombre, tipo: "pregunta" }),
+    });
+
     try {
       const resp = await fetch("/api/tutor", {
         method: "POST",
@@ -84,7 +113,12 @@ export default function TutorPage() {
   }
 
   function logre() {
-    registrarLogro(temaId!);
+    // Registrar logro en BD (fire and forget)
+    fetch("/api/progreso", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ tema_id: temaId, tema_nombre: temaNombre, tipo: "logro" }),
+    });
     setMensajes((m) => [...m, { role: "assistant", content: "¡Excelente! 🎉 Lo lograste tú solo. Eso es aprender de verdad." }]);
   }
 
@@ -100,20 +134,29 @@ export default function TutorPage() {
     } finally { setCargando(false); }
   }
 
-  if (!grado) return <main className="contenedor"><p className="nota">Cargando…</p></main>;
+  if (!perfil || !grado) return <main className="contenedor"><p className="nota">Cargando…</p></main>;
 
   if (!temaId) {
     return (
       <main className="contenedor">
-        <Link href="/" className="nota">← Inicio</Link>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Link href="/" className="nota">← Inicio</Link>
+          <Link href="/padres" className="nota">Ver avance →</Link>
+        </div>
         <h1 style={{ fontSize: 28, margin: "12px 0 18px" }}>
-          {hijo}, ¿con qué <span className="marca">tema</span> necesitas ayuda?
+          {perfil.nombre_hijo}, ¿con qué <span className="marca">tema</span> necesitas ayuda?
         </h1>
         <div className="fila">
           {temasPorGrado(grado).map((t) => (
             <button key={t.id} className="chip" onClick={() => elegirTema(t.id, t.nombre)}>{t.nombre}</button>
           ))}
         </div>
+        {!esPro() && (
+          <p className="nota" style={{ marginTop: 20 }}>
+            Plan gratuito · {quedanGratis()} preguntas restantes ·{" "}
+            <Link href="/#planes" style={{ color: "var(--coral)" }}>Ver planes</Link>
+          </p>
+        )}
       </main>
     );
   }
@@ -121,15 +164,17 @@ export default function TutorPage() {
   return (
     <main className="contenedor">
       <div className="fila" style={{ justifyContent: "space-between" }}>
-        <button className="nota" onClick={() => setTemaId(null)} style={{ background: "none", border: "none", cursor: "pointer" }}>← {temaNombre}</button>
-        <span className="racha">{estaSuscrito() ? "★ Plan activo" : `${quedanGratis()} gratis`}</span>
+        <button className="nota" onClick={() => setTemaId(null)} style={{ background: "none", border: "none", cursor: "pointer" }}>
+          ← {temaNombre}
+        </button>
+        <span className="racha">{esPro() ? "★ Plan activo" : `${quedanGratis()} gratis`}</span>
       </div>
 
-      <div className="chat">
+      <div className="chat" ref={chatRef}>
         {mensajes.map((m, i) => (
           <div key={i} className={`burbuja ${m.role === "assistant" ? "tutor" : "nino"}`}>
             {m.img && <img src={m.img} className="thumb" alt="tarea" />}
-            {m.content}
+            <MensajeChat texto={m.content} esNino={m.role === "user"} />
           </div>
         ))}
         {cargando && <div className="burbuja tutor">Pensando…</div>}
@@ -151,8 +196,13 @@ export default function TutorPage() {
         <div className="tarjeta muro">
           <h3 style={{ fontSize: 22, marginBottom: 8 }}>Se acabaron las preguntas gratis</h3>
           <p className="nota" style={{ marginBottom: 16 }}>Activa el plan para preguntas ilimitadas y el reporte de avance.</p>
-          <button className="btn coral" onClick={() => { suscribir(); setMuro(false); }}>Activar plan · $29.900/mes</button>
-          <p className="nota" style={{ marginTop: 10 }}>(Demo: aquí va el pago con Nequi / PSE / tarjeta)</p>
+          <Link href="/api/checkout?plan=mensual">
+            <span className="btn coral">Activar plan mensual · $39.900/mes →</span>
+          </Link>
+          <br />
+          <Link href="/api/checkout?plan=anual">
+            <span className="btn fantasma" style={{ marginTop: 10, display: "inline-block" }}>Plan anual · $199.999/año (ahorra 58%)</span>
+          </Link>
         </div>
       ) : (
         <>
@@ -160,9 +210,13 @@ export default function TutorPage() {
           <div className="entrada">
             <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={leerFoto} />
             <button className="iconbtn" onClick={() => fileRef.current?.click()} title="Foto de la tarea">📷</button>
-            <textarea rows={1} placeholder="Escribe lo que intentaste…" value={texto}
+            <textarea
+              rows={1}
+              placeholder="Escribe lo que intentaste…"
+              value={texto}
               onChange={(e) => setTexto(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }} />
+              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }}
+            />
             <button className="btn coral" onClick={enviar} disabled={cargando}>Enviar</button>
           </div>
           <div className="fila" style={{ marginTop: 12 }}>
