@@ -7,7 +7,7 @@ import { useUser } from "@clerk/nextjs";
 import { temasPorGrado, Grado } from "@/lib/curriculo";
 import { MensajeChat } from "@/app/components/MensajeChat";
 
-interface Msg { role: "user" | "assistant"; content: string; img?: string; }
+interface Msg { role: "user" | "assistant"; content: string; img?: string; reintentable?: boolean; }
 interface Ejercicio { enunciado: string; pista: string; }
 interface Perfil { nombre_hijo: string; grado: string; plan: string; onboarding_completado: boolean; }
 
@@ -106,9 +106,15 @@ export default function TutorPage() {
         }),
       });
       const data = await resp.json();
-      setMensajes((m) => [...m, { role: "assistant", content: data.respuesta || data.error || "Ups, intenta de nuevo." }]);
+      const msgs: Msg[] = [];
+      if (data.ejercicioExtraido) {
+        msgs.push({ role: "assistant", content: `📋 Ejercicio detectado:\n${data.ejercicioExtraido}` });
+      }
+      const esCaida = resp.status === 503;
+      msgs.push({ role: "assistant", content: data.error || data.respuesta || "Ups, intenta de nuevo.", reintentable: esCaida });
+      setMensajes((m) => [...m, ...msgs]);
     } catch {
-      setMensajes((m) => [...m, { role: "assistant", content: "No pude responder. Revisa tu conexión." }]);
+      setMensajes((m) => [...m, { role: "assistant", content: "No pude responder. Revisa tu conexión.", reintentable: true }]);
     } finally { setCargando(false); }
   }
 
@@ -175,6 +181,16 @@ export default function TutorPage() {
           <div key={i} className={`burbuja ${m.role === "assistant" ? "tutor" : "nino"}`}>
             {m.img && <img src={m.img} className="thumb" alt="tarea" />}
             <MensajeChat texto={m.content} esNino={m.role === "user"} />
+            {m.reintentable && (
+              <button
+                className="btn-reintento"
+                onClick={enviar}
+                disabled={cargando}
+                style={{ marginTop: 8 }}
+              >
+                🔄 Reintentar
+              </button>
+            )}
           </div>
         ))}
         {cargando && <div className="burbuja tutor">Pensando…</div>}

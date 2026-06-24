@@ -10,6 +10,30 @@ export interface Mensaje {
   content: string | Bloque[];
 }
 
+// Llamada rápida sin system prompt — solo para extracción/OCR de imagen
+export async function llamarRapido(messages: Mensaje[], maxTokens = 300): Promise<string> {
+  return llamarModelo("Eres un asistente que extrae texto de imágenes. Responde solo con el texto extraído.", messages, maxTokens)
+}
+
+// Errores que vale la pena reintentar (servidor caído, timeout, rate limit)
+function esReintentable(err: unknown): boolean {
+  const msg = String(err)
+  return msg.includes("503") || msg.includes("529") || msg.includes("overloaded") ||
+    msg.includes("unavailable") || msg.includes("rate") || msg.includes("timeout")
+}
+
+async function conReintentos<T>(fn: () => Promise<T>, intentos = 2, delayMs = 800): Promise<T> {
+  for (let i = 0; i <= intentos; i++) {
+    try {
+      return await fn()
+    } catch (err) {
+      if (i === intentos || !esReintentable(err)) throw err
+      await new Promise(r => setTimeout(r, delayMs * (i + 1)))
+    }
+  }
+  throw new Error("Sin respuesta tras reintentos")
+}
+
 export async function llamarModelo(
   system: string,
   messages: Mensaje[],
@@ -19,9 +43,32 @@ export async function llamarModelo(
   const groqKey = process.env.GROQ_API_KEY
   const anthropicKey = process.env.ANTHROPIC_API_KEY
 
-  if (geminiKey) return llamarGemini(geminiKey, system, messages, maxTokens)
-  if (groqKey) return llamarGroq(groqKey, system, messages, maxTokens)
-  if (anthropicKey) return llamarAnthropic(anthropicKey, system, messages, maxTokens)
+  // Intenta el proveedor principal con reintentos; si falla por 503/timeout, pasa al siguiente
+  if (geminiKey) {
+    try {
+      return await conReintentos(() => llamarGemini(geminiKey, system, messages, maxTokens))
+    } catch (err) {
+      if (esReintentable(err) && (groqKey || anthropicKey)) {
+        console.warn("[IA] Gemini no disponible, usando fallback:", String(err).slice(0, 80))
+      } else {
+        throw err
+      }
+    }
+  }
+  if (groqKey) {
+    try {
+      return await conReintentos(() => llamarGroq(groqKey, system, messages, maxTokens))
+    } catch (err) {
+      if (esReintentable(err) && anthropicKey) {
+        console.warn("[IA] Groq no disponible, usando fallback:", String(err).slice(0, 80))
+      } else {
+        throw err
+      }
+    }
+  }
+  if (anthropicKey) {
+    return await conReintentos(() => llamarAnthropic(anthropicKey, system, messages, maxTokens))
+  }
   throw new Error("Configura GEMINI_API_KEY, GROQ_API_KEY o ANTHROPIC_API_KEY en .env.local")
 }
 
