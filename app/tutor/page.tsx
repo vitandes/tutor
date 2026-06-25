@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
@@ -13,7 +13,7 @@ interface Perfil { nombre_hijo: string; grado: string; plan: string; onboarding_
 
 const LIMITE_GRATIS = 5;
 
-export default function TutorPage() {
+function TutorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isLoaded, isSignedIn } = useUser();
@@ -257,5 +257,13 @@ export default function TutorPage() {
         </>
       )}
     </main>
+  );
+}
+
+export default function TutorPage() {
+  return (
+    <Suspense fallback={<main className="contenedor"><p className="nota">Cargando…</p></main>}>
+      <TutorContent />
+    </Suspense>
   );
 }
