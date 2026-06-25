@@ -2,80 +2,132 @@
 
 import Link from "next/link"
 import { use } from "react"
-import { getUnidad, GRADO3 } from "@/lib/clases"
+import { getUnidad } from "@/lib/clases"
 import { notFound } from "next/navigation"
 
-const COLOR_MAP: Record<string, { bg: string; border: string; text: string; badge: string; icon_bg: string }> = {
-  blue:   { bg: "bg-blue-600",   border: "border-blue-200",  text: "text-blue-700",  badge: "bg-blue-100 text-blue-700",   icon_bg: "bg-blue-50" },
-  green:  { bg: "bg-green-600",  border: "border-green-200", text: "text-green-700", badge: "bg-green-100 text-green-700",  icon_bg: "bg-green-50" },
-  purple: { bg: "bg-purple-600", border: "border-purple-200",text: "text-purple-700",badge: "bg-purple-100 text-purple-700",icon_bg: "bg-purple-50" },
-  orange: { bg: "bg-orange-500", border: "border-orange-200",text: "text-orange-700",badge: "bg-orange-100 text-orange-700",icon_bg: "bg-orange-50" },
-  teal:   { bg: "bg-teal-600",   border: "border-teal-200",  text: "text-teal-700",  badge: "bg-teal-100 text-teal-700",   icon_bg: "bg-teal-50" },
-  red:    { bg: "bg-red-600",    border: "border-red-200",   text: "text-red-700",   badge: "bg-red-100 text-red-700",     icon_bg: "bg-red-50" },
-}
+const COLORES = [
+  { fondo: "#e8f4fd", borde: "#2980b9", texto: "#1a5276", header: "#2980b9" },
+  { fondo: "#eafaf1", borde: "#27ae60", texto: "#1e8449", header: "#27ae60" },
+  { fondo: "#f5eef8", borde: "#8e44ad", texto: "#6c3483", header: "#8e44ad" },
+  { fondo: "#fef9e7", borde: "#f39c12", texto: "#9a7d0a", header: "#e67e22" },
+  { fondo: "#e8f8f5", borde: "#16a085", texto: "#0e6655", header: "#16a085" },
+  { fondo: "#fdedec", borde: "#e74c3c", texto: "#922b21", header: "#e74c3c" },
+]
 
 export default function UnidadPage({ params }: { params: Promise<{ unidadId: string }> }) {
   const { unidadId } = use(params)
   const unidad = getUnidad(3, Number(unidadId))
   if (!unidad) notFound()
 
-  const c = COLOR_MAP[unidad.color] ?? COLOR_MAP.blue
+  const col = COLORES[(unidad.id - 1) % COLORES.length]
 
   return (
-    <main className="min-h-screen bg-gray-50 pb-16">
-      {/* Header de color */}
-      <div className={`${c.bg} text-white px-4 pt-6 pb-12`}>
-        <div className="max-w-3xl mx-auto">
-          <div className="flex items-center gap-2 mb-4 text-white/80 text-sm">
-            <Link href="/clases" className="hover:text-white">📚 Clases</Link>
-            <span>›</span>
-            <span>Unidad {unidad.id}</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-4xl">
-              {unidad.icono}
-            </div>
-            <div>
-              <p className="text-white/70 text-sm uppercase tracking-wide font-semibold">Unidad {unidad.id}</p>
-              <h1 className="text-2xl font-bold">{unidad.nombre}</h1>
-              <p className="text-white/80 text-sm mt-0.5">{unidad.lecciones.length} lecciones</p>
-            </div>
-          </div>
+    <main className="contenedor">
+      {/* Breadcrumb */}
+      <div className="fila" style={{ gap: 6, marginBottom: 16, fontSize: 13, color: "var(--gris)" }}>
+        <Link href="/clases" className="nota">📚 Clases</Link>
+        <span>›</span>
+        <span>Unidad {unidad.id}</span>
+      </div>
+
+      {/* Header de unidad */}
+      <div className="tarjeta" style={{
+        background: col.fondo,
+        border: `2px solid ${col.borde}`,
+        boxShadow: `4px 4px 0 ${col.borde}`,
+        marginBottom: 24,
+        display: "flex",
+        alignItems: "center",
+        gap: 16,
+      }}>
+        <div style={{
+          width: 64,
+          height: 64,
+          borderRadius: 14,
+          background: "#fff",
+          border: `2px solid ${col.borde}`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 32,
+          flexShrink: 0,
+        }}>
+          {unidad.icono}
+        </div>
+        <div>
+          <p className="eyebrow" style={{ color: col.texto }}>Unidad {unidad.id}</p>
+          <h1 style={{ fontSize: 22, margin: "4px 0 2px" }}>{unidad.nombre}</h1>
+          <p className="nota">{unidad.descripcion}</p>
         </div>
       </div>
 
       {/* Lista de lecciones */}
-      <div className="max-w-3xl mx-auto px-4 -mt-6">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          {unidad.lecciones.map((leccion, idx) => (
-            <Link
-              key={leccion.id}
-              href={`/clases/${unidad.id}/${leccion.id}`}
-              className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
-            >
-              <div className={`w-9 h-9 rounded-full ${c.icon_bg} flex items-center justify-center flex-shrink-0`}>
-                <span className={`text-sm font-bold ${c.text}`}>{idx + 1}</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 text-sm leading-tight">{leccion.titulo}</h3>
-                <p className="text-gray-500 text-xs mt-0.5 truncate">{leccion.objetivo}</p>
-              </div>
-              <div className="flex-shrink-0 flex items-center gap-2">
-                <span className="text-xs text-gray-400">{leccion.ejercicios.length} ejercicios</span>
-                <span className="text-gray-400">›</span>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        <div className="mt-4">
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {unidad.lecciones.map((leccion, idx) => (
           <Link
-            href="/clases"
-            className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
+            key={leccion.id}
+            href={`/clases/${unidad.id}/${leccion.id}`}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 14,
+              background: "#fff",
+              border: "2px solid var(--tinta)",
+              borderRadius: "var(--radio)",
+              padding: "14px 18px",
+              boxShadow: "3px 3px 0 var(--tinta)",
+              textDecoration: "none",
+              color: "var(--tinta)",
+              transition: "transform 0.08s, box-shadow 0.08s",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.transform = "translate(2px,2px)"
+              ;(e.currentTarget as HTMLElement).style.boxShadow = "1px 1px 0 var(--tinta)"
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.transform = ""
+              ;(e.currentTarget as HTMLElement).style.boxShadow = "3px 3px 0 var(--tinta)"
+            }}
           >
-            ← Ver todas las unidades
+            {/* Número */}
+            <div style={{
+              width: 36,
+              height: 36,
+              borderRadius: "50%",
+              background: col.header,
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: "var(--display)",
+              fontWeight: 700,
+              fontSize: 15,
+              flexShrink: 0,
+            }}>
+              {idx + 1}
+            </div>
+
+            {/* Texto */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontFamily: "var(--display)", fontWeight: 600, fontSize: 15, lineHeight: 1.3 }}>
+                {leccion.titulo}
+              </p>
+              <p style={{ fontSize: 12, color: "var(--gris)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {leccion.objetivo}
+              </p>
+            </div>
+
+            {/* Meta */}
+            <div style={{ flexShrink: 0, textAlign: "right", fontSize: 12, color: "var(--gris)" }}>
+              <div>{leccion.ejercicios.length} ejercicios</div>
+              <div style={{ fontSize: 18, color: col.borde, marginTop: 2 }}>›</div>
+            </div>
           </Link>
-        </div>
+        ))}
+      </div>
+
+      <div style={{ marginTop: 24 }}>
+        <Link href="/clases" className="nota">← Ver todas las unidades</Link>
       </div>
     </main>
   )

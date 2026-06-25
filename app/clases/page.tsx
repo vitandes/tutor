@@ -3,52 +3,98 @@
 import Link from "next/link"
 import { GRADO3 } from "@/lib/clases"
 
-const COLOR_MAP: Record<string, { bg: string; border: string; text: string; icon_bg: string }> = {
-  blue:   { bg: "bg-blue-50",   border: "border-blue-200",  text: "text-blue-700",  icon_bg: "bg-blue-100" },
-  green:  { bg: "bg-green-50",  border: "border-green-200", text: "text-green-700", icon_bg: "bg-green-100" },
-  purple: { bg: "bg-purple-50", border: "border-purple-200",text: "text-purple-700",icon_bg: "bg-purple-100" },
-  orange: { bg: "bg-orange-50", border: "border-orange-200",text: "text-orange-700",icon_bg: "bg-orange-100" },
-  teal:   { bg: "bg-teal-50",   border: "border-teal-200",  text: "text-teal-700",  icon_bg: "bg-teal-100" },
-  red:    { bg: "bg-red-50",    border: "border-red-200",   text: "text-red-700",   icon_bg: "bg-red-100" },
-}
+const COLORES = [
+  { fondo: "#e8f4fd", borde: "#2980b9", texto: "#1a5276" },
+  { fondo: "#eafaf1", borde: "#27ae60", texto: "#1e8449" },
+  { fondo: "#f5eef8", borde: "#8e44ad", texto: "#6c3483" },
+  { fondo: "#fef9e7", borde: "#f39c12", texto: "#9a7d0a" },
+  { fondo: "#e8f8f5", borde: "#16a085", texto: "#0e6655" },
+  { fondo: "#fdedec", borde: "#e74c3c", texto: "#922b21" },
+]
 
 export default function ClasesPage() {
+  const totalLecciones = GRADO3.unidades.reduce((a, u) => a + u.lecciones.length, 0)
+
   return (
-    <main className="min-h-screen bg-gray-50 pb-16">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-6">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex items-center gap-3 mb-1">
-            <Link href="/tutor" className="text-sm text-gray-500 hover:text-gray-700">← Tutor</Link>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">📚 Clases de Matemáticas</h1>
-          <p className="text-gray-500 mt-1">Tercer Grado · {GRADO3.unidades.length} unidades · {GRADO3.unidades.reduce((a, u) => a + u.lecciones.length, 0)} lecciones</p>
-        </div>
+    <main className="contenedor">
+      {/* Breadcrumb */}
+      <div className="fila" style={{ justifyContent: "space-between", marginBottom: 4 }}>
+        <Link href="/tutor" className="nota">← Tutor</Link>
       </div>
 
-      {/* Unidades */}
-      <div className="max-w-3xl mx-auto px-4 py-8 space-y-4">
-        {GRADO3.unidades.map((unidad) => {
-          const c = COLOR_MAP[unidad.color] ?? COLOR_MAP.blue
+      {/* Título */}
+      <h1 style={{ fontSize: 30, margin: "12px 0 4px" }}>
+        📚 <span className="marca">Clases</span> de Matemáticas
+      </h1>
+      <p className="nota" style={{ marginBottom: 28 }}>
+        Grado 3 · {GRADO3.unidades.length} unidades · {totalLecciones} lecciones
+      </p>
+
+      {/* Grid de unidades */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        {GRADO3.unidades.map((unidad, i) => {
+          const col = COLORES[i % COLORES.length]
           return (
             <Link
               key={unidad.id}
               href={`/clases/${unidad.id}`}
-              className={`flex items-center gap-4 p-5 rounded-2xl border-2 ${c.bg} ${c.border} hover:shadow-md transition-shadow`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+                background: col.fondo,
+                border: `2px solid ${col.borde}`,
+                borderRadius: "var(--radio)",
+                padding: "16px 20px",
+                boxShadow: `4px 4px 0 ${col.borde}`,
+                textDecoration: "none",
+                color: "var(--tinta)",
+                transition: "transform 0.08s ease, box-shadow 0.08s ease",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = "translate(2px,2px)"
+                ;(e.currentTarget as HTMLElement).style.boxShadow = `2px 2px 0 ${col.borde}`
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = ""
+                ;(e.currentTarget as HTMLElement).style.boxShadow = `4px 4px 0 ${col.borde}`
+              }}
             >
-              <div className={`w-14 h-14 rounded-xl ${c.icon_bg} flex items-center justify-center text-3xl flex-shrink-0`}>
+              {/* Ícono */}
+              <div style={{
+                width: 56,
+                height: 56,
+                borderRadius: 14,
+                background: "#fff",
+                border: `2px solid ${col.borde}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 28,
+                flexShrink: 0,
+              }}>
                 {unidad.icono}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className={`text-xs font-semibold uppercase tracking-wide ${c.text} mb-0.5`}>
+
+              {/* Texto */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: col.texto, marginBottom: 2 }}>
                   Unidad {unidad.id}
                 </p>
-                <h2 className="font-bold text-gray-900 text-lg leading-tight">{unidad.nombre}</h2>
-                <p className="text-gray-500 text-sm mt-0.5 truncate">{unidad.descripcion}</p>
+                <h2 style={{ fontFamily: "var(--display)", fontSize: 18, fontWeight: 700, lineHeight: 1.2, marginBottom: 2 }}>
+                  {unidad.nombre}
+                </h2>
+                <p style={{ fontSize: 13, color: "var(--gris)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {unidad.descripcion}
+                </p>
               </div>
-              <div className="flex-shrink-0 text-right">
-                <span className={`text-sm font-medium ${c.text}`}>{unidad.lecciones.length} lecciones</span>
-                <div className="text-gray-400 text-lg mt-1">→</div>
+
+              {/* Contador */}
+              <div style={{ flexShrink: 0, textAlign: "right" }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: col.texto }}>
+                  {unidad.lecciones.length} lecciones
+                </span>
+                <div style={{ fontSize: 20, color: col.borde, marginTop: 2 }}>→</div>
               </div>
             </Link>
           )

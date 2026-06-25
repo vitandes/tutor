@@ -2,43 +2,35 @@
 
 import { use, useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { getLeccion, getUnidad, getLeccionAnteriorSiguiente } from "@/lib/clases"
 import type { Ejercicio } from "@/lib/clases"
 import { notFound } from "next/navigation"
 
-const COLOR_MAP: Record<string, { accent: string; light: string; text: string; btn: string }> = {
-  blue:   { accent: "bg-blue-600",   light: "bg-blue-50",   text: "text-blue-700",  btn: "bg-blue-600 hover:bg-blue-700" },
-  green:  { accent: "bg-green-600",  light: "bg-green-50",  text: "text-green-700", btn: "bg-green-600 hover:bg-green-700" },
-  purple: { accent: "bg-purple-600", light: "bg-purple-50", text: "text-purple-700",btn: "bg-purple-600 hover:bg-purple-700" },
-  orange: { accent: "bg-orange-500", light: "bg-orange-50", text: "text-orange-700",btn: "bg-orange-500 hover:bg-orange-600" },
-  teal:   { accent: "bg-teal-600",   light: "bg-teal-50",   text: "text-teal-700",  btn: "bg-teal-600 hover:bg-teal-700" },
-  red:    { accent: "bg-red-600",    light: "bg-red-50",    text: "text-red-700",   btn: "bg-red-600 hover:bg-red-700" },
-}
+const COLORES = [
+  { fondo: "#e8f4fd", borde: "#2980b9", texto: "#1a5276", header: "#2980b9" },
+  { fondo: "#eafaf1", borde: "#27ae60", texto: "#1e8449", header: "#27ae60" },
+  { fondo: "#f5eef8", borde: "#8e44ad", texto: "#6c3483", header: "#8e44ad" },
+  { fondo: "#fef9e7", borde: "#f39c12", texto: "#9a7d0a", header: "#e67e22" },
+  { fondo: "#e8f8f5", borde: "#16a085", texto: "#0e6655", header: "#16a085" },
+  { fondo: "#fdedec", borde: "#e74c3c", texto: "#922b21", header: "#e74c3c" },
+]
 
-type RespuestaEstado = {
-  valor: string
-  revisada: boolean
-  correcta: boolean | null
-}
+type EstadoRespuesta = { valor: string; revisada: boolean; correcta: boolean | null }
 
-function EjercicioCard({
-  ejercicio,
-  numero,
-  color,
-}: {
+function EjercicioCard({ ejercicio, numero, col }: {
   ejercicio: Ejercicio
   numero: number
-  color: string
+  col: typeof COLORES[0]
 }) {
-  const c = COLOR_MAP[color] ?? COLOR_MAP.blue
-  const [estado, setEstado] = useState<RespuestaEstado>({ valor: "", revisada: false, correcta: null })
+  const [estado, setEstado] = useState<EstadoRespuesta>({ valor: "", revisada: false, correcta: null })
   const [mostrarPista, setMostrarPista] = useState(false)
 
+  function normalizar(s: string) {
+    return s.trim().toLowerCase().replace(/[\s.,]/g, "")
+  }
+
   function verificar() {
-    const respuestaLimpia = estado.valor.trim().toLowerCase().replace(/\s+/g, "").replace(/\./g, "")
-    const correctaLimpia = String(ejercicio.respuesta).toLowerCase().replace(/\s+/g, "").replace(/\./g, "")
-    const correcta = respuestaLimpia === correctaLimpia
+    const correcta = normalizar(estado.valor) === normalizar(String(ejercicio.respuesta))
     setEstado((p) => ({ ...p, revisada: true, correcta }))
   }
 
@@ -47,94 +39,163 @@ function EjercicioCard({
     setMostrarPista(false)
   }
 
+  const borderColor = estado.revisada
+    ? estado.correcta ? "#27ae60" : "#e74c3c"
+    : "var(--tinta)"
+  const fondoColor = estado.revisada
+    ? estado.correcta ? "#eafaf1" : "#fdedec"
+    : "#fff"
+
   return (
-    <div className={`rounded-2xl border-2 p-5 ${estado.revisada ? (estado.correcta ? "border-green-300 bg-green-50" : "border-red-200 bg-red-50") : "border-gray-200 bg-white"}`}>
-      {/* Número y enunciado */}
-      <div className="flex gap-3 mb-4">
-        <div className={`w-8 h-8 rounded-full ${c.accent} text-white flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5`}>
+    <div style={{
+      background: fondoColor,
+      border: `2px solid ${borderColor}`,
+      borderRadius: "var(--radio)",
+      boxShadow: `3px 3px 0 ${borderColor}`,
+      padding: "16px 18px",
+    }}>
+      {/* Enunciado */}
+      <div className="fila" style={{ alignItems: "flex-start", gap: 12, marginBottom: 14 }}>
+        <div style={{
+          width: 32,
+          height: 32,
+          borderRadius: "50%",
+          background: col.header,
+          color: "#fff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "var(--display)",
+          fontWeight: 700,
+          fontSize: 14,
+          flexShrink: 0,
+          marginTop: 2,
+        }}>
           {numero}
         </div>
-        <p className="text-gray-900 font-medium leading-snug">{ejercicio.enunciado}</p>
+        <p style={{ fontWeight: 600, fontSize: 15, lineHeight: 1.4, flex: 1 }}>{ejercicio.enunciado}</p>
       </div>
 
-      {/* Input según tipo */}
+      {/* Respuesta */}
       {!estado.revisada ? (
-        <>
+        <div style={{ paddingLeft: 44 }}>
+          {/* Selección múltiple */}
           {ejercicio.tipo === "seleccion" && ejercicio.opciones && (
-            <div className="space-y-2 ml-11">
-              {ejercicio.opciones.map((opcion) => (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {ejercicio.opciones.map((op) => (
                 <button
-                  key={opcion}
-                  onClick={() => setEstado((p) => ({ ...p, valor: opcion }))}
-                  className={`w-full text-left px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all ${
-                    estado.valor === opcion
-                      ? `${c.light} ${c.text} border-current`
-                      : "bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-300"
-                  }`}
+                  key={op}
+                  onClick={() => setEstado((p) => ({ ...p, valor: op }))}
+                  style={{
+                    textAlign: "left",
+                    padding: "10px 14px",
+                    borderRadius: 12,
+                    border: `2px solid ${estado.valor === op ? col.borde : "var(--linea)"}`,
+                    background: estado.valor === op ? col.fondo : "#f8f9fa",
+                    color: estado.valor === op ? col.texto : "var(--tinta)",
+                    fontFamily: "var(--texto)",
+                    fontSize: 14,
+                    fontWeight: estado.valor === op ? 700 : 400,
+                    cursor: "pointer",
+                  }}
                 >
-                  {opcion}
+                  {op}
                 </button>
               ))}
             </div>
           )}
 
+          {/* Número o texto */}
           {(ejercicio.tipo === "numero" || ejercicio.tipo === "texto") && (
-            <div className="ml-11">
-              <input
-                type={ejercicio.tipo === "numero" ? "number" : "text"}
-                value={estado.valor}
-                onChange={(e) => setEstado((p) => ({ ...p, valor: e.target.value }))}
-                placeholder={ejercicio.tipo === "numero" ? "Escribe el número..." : "Escribe tu respuesta..."}
-                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-400"
-                onKeyDown={(e) => e.key === "Enter" && estado.valor && verificar()}
-              />
-            </div>
+            <input
+              type={ejercicio.tipo === "numero" ? "number" : "text"}
+              value={estado.valor}
+              onChange={(e) => setEstado((p) => ({ ...p, valor: e.target.value }))}
+              placeholder={ejercicio.tipo === "numero" ? "Escribe el número..." : "Escribe tu respuesta..."}
+              onKeyDown={(e) => e.key === "Enter" && estado.valor && verificar()}
+              style={{
+                width: "100%",
+                padding: "10px 14px",
+                borderRadius: 12,
+                border: "2px solid var(--linea)",
+                fontFamily: "var(--texto)",
+                fontSize: 15,
+                outline: "none",
+                background: "#f8f9fa",
+              }}
+            />
           )}
 
           {/* Acciones */}
-          <div className="flex items-center gap-3 mt-4 ml-11">
+          <div className="fila" style={{ marginTop: 12, gap: 12 }}>
             <button
               onClick={verificar}
               disabled={!estado.valor}
-              className={`px-5 py-2.5 rounded-xl text-white text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed ${c.btn}`}
+              className="btn"
+              style={{ fontSize: 14, padding: "9px 18px" }}
             >
               Verificar
             </button>
             <button
               onClick={() => setMostrarPista(!mostrarPista)}
-              className="text-sm text-gray-500 hover:text-gray-700 underline underline-offset-2"
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: "var(--gris)",
+                fontSize: 13,
+                textDecoration: "underline",
+                fontFamily: "var(--texto)",
+              }}
             >
               {mostrarPista ? "Ocultar pista" : "💡 Ver pista"}
             </button>
           </div>
 
           {mostrarPista && (
-            <div className={`mt-3 ml-11 px-4 py-3 rounded-xl ${c.light} ${c.text} text-sm`}>
+            <div style={{
+              marginTop: 10,
+              padding: "10px 14px",
+              background: "var(--marcador)",
+              borderRadius: 10,
+              border: "2px solid var(--tinta)",
+              fontSize: 13,
+            }}>
               💡 {ejercicio.pista}
             </div>
           )}
-        </>
+        </div>
       ) : (
-        <div className="ml-11">
+        <div style={{ paddingLeft: 44 }}>
           {estado.correcta ? (
-            <div className="flex items-start gap-2">
-              <span className="text-2xl">✅</span>
+            <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+              <span style={{ fontSize: 22 }}>✅</span>
               <div>
-                <p className="font-semibold text-green-700">¡Correcto!</p>
-                <p className="text-sm text-green-600 mt-1">{ejercicio.explicacion}</p>
+                <p style={{ fontFamily: "var(--display)", fontWeight: 700, color: "#1e8449", fontSize: 15 }}>¡Correcto!</p>
+                <p style={{ fontSize: 13, color: "#1e8449", marginTop: 4, lineHeight: 1.5 }}>{ejercicio.explicacion}</p>
               </div>
             </div>
           ) : (
-            <div className="flex items-start gap-2">
-              <span className="text-2xl">❌</span>
+            <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+              <span style={{ fontSize: 22 }}>❌</span>
               <div>
-                <p className="font-semibold text-red-700">Casi, sigue intentando</p>
-                <p className="text-sm text-red-600 mt-1">{ejercicio.explicacion}</p>
+                <p style={{ fontFamily: "var(--display)", fontWeight: 700, color: "#922b21", fontSize: 15 }}>Casi, ¡tú puedes!</p>
+                <p style={{ fontSize: 13, color: "#922b21", marginTop: 4, lineHeight: 1.5 }}>{ejercicio.explicacion}</p>
                 <button
                   onClick={reintentar}
-                  className="mt-2 text-sm font-medium text-red-700 underline underline-offset-2"
+                  style={{
+                    marginTop: 8,
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "#922b21",
+                    fontFamily: "var(--texto)",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    textDecoration: "underline",
+                  }}
                 >
-                  Intentar de nuevo
+                  🔄 Intentar de nuevo
                 </button>
               </div>
             </div>
@@ -157,134 +218,177 @@ export default function LeccionPage({
   if (!unidad || !leccion) notFound()
 
   const { anterior, siguiente } = getLeccionAnteriorSiguiente(3, unidadNum, leccionId)
-  const c = COLOR_MAP[unidad.color] ?? COLOR_MAP.blue
-  const router = useRouter()
+  const col = COLORES[(unidad.id - 1) % COLORES.length]
 
   const tutorUrl = `/tutor?tema=${encodeURIComponent(leccion.titulo)}&contexto=${encodeURIComponent(`Estoy estudiando: ${leccion.titulo}. ${leccion.concepto_clave}`)}`
 
   return (
-    <main className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <div className={`${c.accent} text-white px-4 pt-5 pb-8`}>
-        <div className="max-w-2xl mx-auto">
-          <div className="flex items-center gap-2 mb-4 text-white/70 text-sm">
-            <Link href="/clases" className="hover:text-white">📚 Clases</Link>
-            <span>›</span>
-            <Link href={`/clases/${unidadId}`} className="hover:text-white">{unidad.nombre}</Link>
-          </div>
-          <h1 className="text-xl font-bold leading-tight">{leccion.titulo}</h1>
-          <p className="text-white/80 text-sm mt-1">🎯 {leccion.objetivo}</p>
+    <main className="contenedor">
+      {/* Breadcrumb */}
+      <div className="fila" style={{ gap: 6, marginBottom: 16, fontSize: 13, color: "var(--gris)" }}>
+        <Link href="/clases" className="nota">📚 Clases</Link>
+        <span>›</span>
+        <Link href={`/clases/${unidadId}`} className="nota">{unidad.nombre}</Link>
+        <span>›</span>
+        <span style={{ color: "var(--tinta)" }}>{leccion.titulo}</span>
+      </div>
+
+      {/* Título de lección */}
+      <h1 style={{ fontSize: 26, marginBottom: 6 }}>{leccion.titulo}</h1>
+      <p className="nota" style={{ marginBottom: 20 }}>🎯 {leccion.objetivo}</p>
+
+      {/* Concepto clave */}
+      <div style={{
+        background: "var(--marcador)",
+        border: "2px solid var(--tinta)",
+        borderRadius: "var(--radio)",
+        boxShadow: "3px 3px 0 var(--tinta)",
+        padding: "14px 18px",
+        marginBottom: 20,
+      }}>
+        <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
+          💡 Concepto clave
+        </p>
+        <p style={{ fontFamily: "var(--display)", fontWeight: 600, fontSize: 15, lineHeight: 1.4 }}>
+          {leccion.concepto_clave}
+        </p>
+      </div>
+
+      {/* Explicación */}
+      <div className="tarjeta" style={{ marginBottom: 20 }}>
+        <h2 style={{ fontSize: 18, marginBottom: 12 }}>📖 Explicación</h2>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {leccion.explicacion.map((parrafo, i) => (
+            <p key={i} style={{ fontSize: 14, lineHeight: 1.7, color: "#333" }}>{parrafo}</p>
+          ))}
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 -mt-4 space-y-5">
+      {/* Ejemplos resueltos */}
+      <div className="tarjeta" style={{ marginBottom: 20 }}>
+        <h2 style={{ fontSize: 18, marginBottom: 16 }}>✏️ Ejemplos resueltos</h2>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {leccion.ejemplos.map((ejemplo, i) => (
+            <div key={i} style={{
+              background: "#f8f9fa",
+              border: "2px solid var(--linea)",
+              borderRadius: 14,
+              padding: "14px 16px",
+            }}>
+              {/* Enunciado */}
+              <div className="fila" style={{ alignItems: "flex-start", gap: 10, marginBottom: 10 }}>
+                <div style={{
+                  width: 26,
+                  height: 26,
+                  borderRadius: "50%",
+                  background: col.header,
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: "var(--display)",
+                  fontWeight: 700,
+                  fontSize: 13,
+                  flexShrink: 0,
+                }}>
+                  {i + 1}
+                </div>
+                <p style={{ fontWeight: 600, fontSize: 14, lineHeight: 1.4 }}>{ejemplo.enunciado}</p>
+              </div>
 
-        {/* Concepto clave */}
-        <div className={`${c.light} border-2 border-current ${c.text} rounded-2xl px-5 py-4`}>
-          <p className="text-xs font-bold uppercase tracking-wide mb-1 opacity-70">💡 Concepto clave</p>
-          <p className="font-semibold text-sm leading-snug">{leccion.concepto_clave}</p>
-        </div>
-
-        {/* Explicación */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-5">
-          <h2 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <span className="text-lg">📖</span> Explicación
-          </h2>
-          <div className="space-y-3">
-            {leccion.explicacion.map((parrafo, i) => (
-              <p key={i} className="text-gray-700 text-sm leading-relaxed">{parrafo}</p>
-            ))}
-          </div>
-        </div>
-
-        {/* Ejemplos resueltos */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-5">
-          <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <span className="text-lg">✏️</span> Ejemplos resueltos
-          </h2>
-          <div className="space-y-5">
-            {leccion.ejemplos.map((ejemplo, i) => (
-              <div key={i} className="border border-gray-100 rounded-xl p-4 bg-gray-50">
-                <p className="font-semibold text-gray-800 text-sm mb-3">
-                  <span className={`inline-flex w-6 h-6 rounded-full ${c.accent} text-white items-center justify-center text-xs mr-2`}>{i + 1}</span>
-                  {ejemplo.enunciado}
-                </p>
-                <div className="space-y-2 ml-8">
-                  {ejemplo.pasos.map((paso, j) => (
-                    <div key={j} className="flex gap-2 text-sm">
-                      <span className="text-gray-400 flex-shrink-0">→</span>
-                      <div>
-                        <span className="text-gray-700">{paso.texto}</span>
-                        {paso.detalle && (
-                          <span className="text-gray-500 ml-1">({paso.detalle})</span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                  <div className={`mt-3 px-3 py-2 rounded-lg ${c.light} ${c.text} text-sm font-semibold`}>
-                    ✅ {ejemplo.resultado}
+              {/* Pasos */}
+              <div style={{ paddingLeft: 36, display: "flex", flexDirection: "column", gap: 6 }}>
+                {ejemplo.pasos.map((paso, j) => (
+                  <div key={j} style={{ display: "flex", gap: 8, fontSize: 13 }}>
+                    <span style={{ color: "var(--gris)", flexShrink: 0 }}>→</span>
+                    <span>
+                      {paso.texto}
+                      {paso.detalle && <span style={{ color: "var(--gris)", marginLeft: 6 }}>({paso.detalle})</span>}
+                    </span>
                   </div>
+                ))}
+
+                {/* Resultado */}
+                <div style={{
+                  marginTop: 8,
+                  padding: "8px 12px",
+                  background: col.fondo,
+                  border: `2px solid ${col.borde}`,
+                  borderRadius: 10,
+                  fontSize: 13,
+                  fontFamily: "var(--display)",
+                  fontWeight: 700,
+                  color: col.texto,
+                }}>
+                  ✅ {ejemplo.resultado}
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
+      </div>
 
-        {/* Ejercicios */}
-        <div>
-          <h2 className="font-bold text-gray-900 mb-3 flex items-center gap-2 text-lg">
-            <span>🎯</span> ¡Practica tú!
-          </h2>
-          <div className="space-y-3">
-            {leccion.ejercicios.map((ejercicio, i) => (
-              <EjercicioCard
-                key={ejercicio.id}
-                ejercicio={ejercicio}
-                numero={i + 1}
-                color={unidad.color}
-              />
-            ))}
-          </div>
-        </div>
+      {/* Ejercicios interactivos */}
+      <h2 style={{ fontSize: 20, marginBottom: 14 }}>🎯 ¡Practica tú!</h2>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 24 }}>
+        {leccion.ejercicios.map((ej, i) => (
+          <EjercicioCard key={ej.id} ejercicio={ej} numero={i + 1} col={col} />
+        ))}
+      </div>
 
-        {/* Botón tutor */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-5 text-center">
-          <p className="text-gray-600 text-sm mb-3">¿Tienes alguna duda sobre esta lección?</p>
+      {/* CTA Tutor */}
+      <div className="tarjeta" style={{ textAlign: "center", marginBottom: 24 }}>
+        <p className="nota" style={{ marginBottom: 12 }}>¿Tienes alguna duda sobre esta lección?</p>
+        <Link href={tutorUrl} className="btn coral" style={{ display: "inline-block" }}>
+          🤖 Preguntarle al tutor
+        </Link>
+      </div>
+
+      {/* Navegación anterior / siguiente */}
+      <div className="fila" style={{ gap: 12 }}>
+        {anterior && (
           <Link
-            href={tutorUrl}
-            className="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-gray-800 transition-colors"
+            href={`/clases/${unidadId}/${anterior.id}`}
+            style={{
+              flex: 1,
+              background: "#fff",
+              border: "2px solid var(--tinta)",
+              borderRadius: "var(--radio)",
+              boxShadow: "3px 3px 0 var(--tinta)",
+              padding: "12px 16px",
+              textDecoration: "none",
+              color: "var(--tinta)",
+              display: "block",
+            }}
           >
-            🤖 Preguntarle al tutor
+            <p style={{ fontSize: 11, color: "var(--gris)", marginBottom: 4 }}>← Lección anterior</p>
+            <p style={{ fontFamily: "var(--display)", fontWeight: 600, fontSize: 14, lineHeight: 1.3 }}>{anterior.titulo}</p>
           </Link>
-        </div>
-
-        {/* Navegación siguiente/anterior */}
-        <div className="flex gap-3">
-          {anterior && (
-            <Link
-              href={`/clases/${unidadId}/${anterior.id}`}
-              className="flex-1 bg-white border border-gray-200 rounded-2xl p-4 hover:shadow-sm transition-shadow text-left"
-            >
-              <p className="text-xs text-gray-400 mb-1">← Lección anterior</p>
-              <p className="text-sm font-semibold text-gray-700 line-clamp-2">{anterior.titulo}</p>
-            </Link>
-          )}
-          {siguiente && (
-            <Link
-              href={`/clases/${unidadId}/${siguiente.id}`}
-              className="flex-1 bg-white border border-gray-200 rounded-2xl p-4 hover:shadow-sm transition-shadow text-right"
-            >
-              <p className="text-xs text-gray-400 mb-1">Siguiente lección →</p>
-              <p className="text-sm font-semibold text-gray-700 line-clamp-2">{siguiente.titulo}</p>
-            </Link>
-          )}
-        </div>
-
-        <div className="text-center">
-          <Link href={`/clases/${unidadId}`} className="text-sm text-gray-400 hover:text-gray-600">
-            Ver todas las lecciones de esta unidad
+        )}
+        {siguiente && (
+          <Link
+            href={`/clases/${unidadId}/${siguiente.id}`}
+            style={{
+              flex: 1,
+              background: "#fff",
+              border: "2px solid var(--tinta)",
+              borderRadius: "var(--radio)",
+              boxShadow: "3px 3px 0 var(--tinta)",
+              padding: "12px 16px",
+              textDecoration: "none",
+              color: "var(--tinta)",
+              display: "block",
+              textAlign: "right",
+            }}
+          >
+            <p style={{ fontSize: 11, color: "var(--gris)", marginBottom: 4 }}>Siguiente lección →</p>
+            <p style={{ fontFamily: "var(--display)", fontWeight: 600, fontSize: 14, lineHeight: 1.3 }}>{siguiente.titulo}</p>
           </Link>
-        </div>
+        )}
+      </div>
+
+      <div style={{ marginTop: 20, textAlign: "center" }}>
+        <Link href={`/clases/${unidadId}`} className="nota">Ver todas las lecciones de esta unidad</Link>
       </div>
     </main>
   )
