@@ -1,0 +1,410 @@
+import type { Unidad } from "../tipos"
+
+const unidad5: Unidad = {
+  id: 5,
+  nombre: "Estadística y Probabilidad",
+  descripcion: "Reúne datos, crea gráficas y aprende sobre posibilidades.",
+  color: "teal",
+  icono: "📊",
+  lecciones: [
+    {
+      id: "3-5-1",
+      titulo: "Tablas de frecuencias",
+      objetivo: "Recopilar datos y organizarlos en tablas de frecuencias.",
+      concepto_clave: "Una tabla de frecuencias organiza datos contando cuántas veces aparece cada valor.",
+      explicacion: [
+        "Cuando recogemos muchos datos (como los colores favoritos de la clase), necesitamos organizarlos para entenderlos. Una TABLA DE FRECUENCIAS hace eso.",
+        "La FRECUENCIA nos dice cuántas veces aparece cada dato. Se puede contar con marcas de conteo (palitos: ||||).",
+        "La tabla tiene: columna de datos (qué estamos midiendo) y columna de frecuencia (cuántas veces aparece cada uno).",
+      ],
+      ejemplos: [
+        {
+          enunciado: "En el salón, 8 estudiantes prefieren fútbol, 5 baloncesto, 4 natación y 3 voleibol. Organízalos.",
+          pasos: [
+            { texto: "Creo la tabla con dos columnas: Deporte | Frecuencia" },
+            { texto: "Lleno con los datos: Fútbol=8, Baloncesto=5, Natación=4, Voleibol=3" },
+            { texto: "Sumo para verificar: 8+5+4+3=20 (total de estudiantes)" },
+          ],
+          resultado: "Tabla: Fútbol(8), Baloncesto(5), Natación(4), Voleibol(3). Total: 20 estudiantes",
+        },
+        {
+          enunciado: "¿Cuál es la frecuencia total de la tabla anterior?",
+          pasos: [
+            { texto: "Sumo todas las frecuencias: 8 + 5 + 4 + 3" },
+          ],
+          resultado: "Frecuencia total = 20 (el total de datos recolectados)",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "3-5-1-e1",
+          enunciado: "En una encuesta de mascotas: 6 niños tienen perro, 4 tienen gato, 2 tienen pez, 1 tiene conejo. ¿Cuál es la frecuencia total?",
+          tipo: "numero",
+          respuesta: "13",
+          pista: "Suma todas las frecuencias: 6 + 4 + 2 + 1.",
+          explicacion: "6 + 4 + 2 + 1 = 13 niños encuestados en total.",
+        },
+        {
+          id: "3-5-1-e2",
+          enunciado: "¿Qué dato tiene mayor frecuencia en esta tabla: Azul=7, Rojo=5, Verde=8, Amarillo=3?",
+          tipo: "seleccion",
+          opciones: ["Azul (7)", "Rojo (5)", "Verde (8)", "Amarillo (3)"],
+          respuesta: "Verde (8)",
+          pista: "El dato con mayor frecuencia es el que tiene el número más grande.",
+          explicacion: "Verde tiene frecuencia 8, que es la mayor de todas.",
+        },
+        {
+          id: "3-5-1-e3",
+          enunciado: "Si la frecuencia total es 30 y hay 4 datos con frecuencias 8, 7 y 6, ¿cuál es la frecuencia del cuarto dato?",
+          tipo: "numero",
+          respuesta: "9",
+          pista: "8 + 7 + 6 + X = 30. Despeja X.",
+          explicacion: "8 + 7 + 6 = 21. El cuarto dato: 30 - 21 = 9.",
+        },
+        {
+          id: "3-5-1-e4",
+          enunciado: "¿Para qué sirve una tabla de frecuencias?",
+          tipo: "texto",
+          respuesta: "Para organizar datos y ver cuántas veces aparece cada valor",
+          pista: "Piensa en lo que hace la tabla con los datos que recolectamos.",
+          explicacion: "Una tabla de frecuencias organiza los datos y nos permite ver de un vistazo cuántas veces aparece cada valor, facilitando el análisis.",
+        },
+      ],
+    },
+    {
+      id: "3-5-2",
+      titulo: "Pictogramas con agrupación",
+      objetivo: "Leer e interpretar pictogramas donde cada símbolo representa más de una unidad.",
+      concepto_clave: "En un pictograma, cada imagen puede representar más de 1 unidad. Hay que leer la clave.",
+      explicacion: [
+        "Un PICTOGRAMA es una gráfica que usa imágenes o símbolos para representar datos. Es como un gráfico de barras pero con dibujos.",
+        "Cuando los datos son grandes, cada símbolo puede representar más de 1 unidad. La CLAVE dice cuánto vale cada símbolo.",
+        "Si la clave dice que 🍎 = 5 manzanas y hay 4 manzanas dibujadas, el total es 4 × 5 = 20 manzanas.",
+      ],
+      ejemplos: [
+        {
+          enunciado: "Un pictograma muestra ventas de arepas. Clave: 🫓 = 10 arepas. Lunes tiene 3 símbolos. ¿Cuántas arepas se vendieron?",
+          pasos: [
+            { texto: "Cada 🫓 vale 10 arepas (clave)" },
+            { texto: "Lunes tiene 3 símbolos" },
+            { texto: "3 × 10 = 30 arepas" },
+          ],
+          resultado: "El lunes se vendieron 30 arepas",
+        },
+        {
+          enunciado: "Si el martes tiene 2 símbolos y medio (½ símbolo = 5 arepas), ¿cuántas arepas son?",
+          pasos: [
+            { texto: "2 símbolos enteros = 2 × 10 = 20 arepas" },
+            { texto: "½ símbolo = 5 arepas" },
+            { texto: "Total: 20 + 5 = 25 arepas" },
+          ],
+          resultado: "El martes se vendieron 25 arepas",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "3-5-2-e1",
+          enunciado: "Clave: ⭐ = 4 puntos. Un estudiante tiene 6 estrellas. ¿Cuántos puntos tiene?",
+          tipo: "numero",
+          respuesta: "24",
+          pista: "Multiplica el número de estrellas por el valor de cada estrella.",
+          explicacion: "6 × 4 = 24 puntos.",
+        },
+        {
+          id: "3-5-2-e2",
+          enunciado: "Clave: 🐄 = 50 vacas. Una finca tiene 3½ vacas dibujadas. ¿Cuántas vacas tiene?",
+          tipo: "numero",
+          respuesta: "175",
+          pista: "3 vacas completas = 3 × 50 = 150. Media vaca = 50 ÷ 2 = 25.",
+          explicacion: "3 × 50 = 150 + ½ × 50 = 25. Total: 150 + 25 = 175 vacas.",
+        },
+        {
+          id: "3-5-2-e3",
+          enunciado: "Si hay 80 libros y cada símbolo vale 20, ¿cuántos símbolos se dibujan?",
+          tipo: "numero",
+          respuesta: "4",
+          pista: "Divide el total entre el valor de cada símbolo: 80 ÷ 20.",
+          explicacion: "80 ÷ 20 = 4 símbolos.",
+        },
+        {
+          id: "3-5-2-e4",
+          enunciado: "¿Por qué en pictogramas con datos grandes se hace que cada símbolo valga más de 1?",
+          tipo: "texto",
+          respuesta: "Para que el pictograma no quede demasiado grande y sea más fácil de leer",
+          pista: "Imagina dibujar 500 manzanas una por una...",
+          explicacion: "Si cada símbolo valiera 1 y hay 500 datos, necesitaríamos 500 dibujos. Con símbolos que valen 50, solo necesitamos 10 dibujos.",
+        },
+      ],
+    },
+    {
+      id: "3-5-3",
+      titulo: "Diagramas de barras",
+      objetivo: "Leer, interpretar y construir diagramas de barras simples.",
+      concepto_clave: "En un diagrama de barras, la altura de cada barra muestra la frecuencia de ese dato.",
+      explicacion: [
+        "Un DIAGRAMA DE BARRAS es una gráfica donde cada dato se representa con una barra (rectángulo). La altura de la barra indica su frecuencia.",
+        "Partes del diagrama: título, eje vertical (escala de números), eje horizontal (categorías) y las barras.",
+        "Para leer un diagrama: mira la barra que te interesa, sigue horizontalmente hasta el eje vertical y lee el número.",
+      ],
+      ejemplos: [
+        {
+          enunciado: "Un diagrama muestra frutas preferidas: Mango=12, Guayaba=8, Maracuyá=5, Lulo=10. ¿Cuál es la más popular?",
+          pasos: [
+            { texto: "Leo la barra más alta: Mango con 12" },
+          ],
+          resultado: "El Mango es la fruta más popular con 12 votos",
+        },
+        {
+          enunciado: "¿Cuántos estudiantes participaron en total en la encuesta de frutas?",
+          pasos: [
+            { texto: "Sumo todas las barras: 12 + 8 + 5 + 10" },
+          ],
+          resultado: "Participaron 35 estudiantes en total",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "3-5-3-e1",
+          enunciado: "Un diagrama de barras muestra: Lunes=15, Martes=10, Miércoles=20, Jueves=12. ¿Qué día hubo más asistencia?",
+          tipo: "seleccion",
+          opciones: ["Lunes", "Martes", "Miércoles", "Jueves"],
+          respuesta: "Miércoles",
+          pista: "El día con más asistencia tiene la barra más alta.",
+          explicacion: "Miércoles tiene la mayor frecuencia (20), por eso su barra es la más alta.",
+        },
+        {
+          id: "3-5-3-e2",
+          enunciado: "¿Cuántos datos más tiene Lunes (15) que Martes (10)?",
+          tipo: "numero",
+          respuesta: "5",
+          pista: "Resta las frecuencias: 15 - 10.",
+          explicacion: "15 - 10 = 5. El lunes tuvo 5 más que el martes.",
+        },
+        {
+          id: "3-5-3-e3",
+          enunciado: "¿Cuál es la diferencia entre un diagrama de barras y un pictograma?",
+          tipo: "texto",
+          respuesta: "El diagrama usa barras rectangulares; el pictograma usa imágenes o símbolos",
+          pista: "Piensa en cómo se representa la frecuencia en cada uno.",
+          explicacion: "El diagrama de barras usa rectángulos cuya altura indica la frecuencia. El pictograma usa imágenes/símbolos para lo mismo.",
+        },
+        {
+          id: "3-5-3-e4",
+          enunciado: "Para construir un diagrama de barras de los colores favoritos de 25 niños, ¿qué va en el eje horizontal?",
+          tipo: "seleccion",
+          opciones: ["Los números de frecuencia", "Los colores", "Los nombres de los niños"],
+          respuesta: "Los colores",
+          pista: "El eje horizontal muestra las categorías que estamos comparando.",
+          explicacion: "El eje horizontal (X) muestra las categorías (colores). El eje vertical (Y) muestra la escala numérica de frecuencias.",
+        },
+      ],
+    },
+    {
+      id: "3-5-4",
+      titulo: "Moda de un conjunto de datos",
+      objetivo: "Identificar la moda como el valor que más se repite en un conjunto de datos.",
+      concepto_clave: "La MODA es el dato que aparece con más frecuencia (el que más se repite).",
+      explicacion: [
+        "La MODA es el valor que más veces aparece en un conjunto de datos. Es una medida de tendencia central.",
+        "Si dos datos aparecen el mismo número de veces y son los más frecuentes, hay dos modas (bimodal). Si todos aparecen igual, no hay moda.",
+        "La moda es útil para saber, por ejemplo, qué talla de zapato se vende más, cuál es el número más común de hermanos en la clase, etc.",
+      ],
+      ejemplos: [
+        {
+          enunciado: "Notas del quiz: 3, 4, 5, 4, 3, 5, 4, 2, 4. ¿Cuál es la moda?",
+          pasos: [
+            { texto: "Cuento cuántas veces aparece cada nota:" },
+            { texto: "2 → 1 vez | 3 → 2 veces | 4 → 4 veces | 5 → 2 veces" },
+            { texto: "El 4 aparece 4 veces → es el más frecuente" },
+          ],
+          resultado: "La moda es 4",
+        },
+        {
+          enunciado: "Edades: 8, 9, 8, 10, 9, 8, 9. ¿Cuál es la moda?",
+          pasos: [
+            { texto: "8 → 3 veces | 9 → 3 veces | 10 → 1 vez" },
+            { texto: "8 y 9 aparecen la misma cantidad de veces (3)" },
+          ],
+          resultado: "Hay dos modas: 8 y 9 (conjunto bimodal)",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "3-5-4-e1",
+          enunciado: "Colores de mochilas: azul, rojo, azul, verde, azul, rojo, negro. ¿Cuál es la moda?",
+          tipo: "seleccion",
+          opciones: ["Rojo", "Azul", "Verde", "Negro"],
+          respuesta: "Azul",
+          pista: "Cuenta cuántas veces aparece cada color.",
+          explicacion: "Azul aparece 3 veces, rojo 2, verde 1, negro 1. La moda es azul.",
+        },
+        {
+          id: "3-5-4-e2",
+          enunciado: "Números de hermanos: 1, 2, 0, 1, 3, 2, 1, 0, 1. ¿Cuál es la moda?",
+          tipo: "numero",
+          respuesta: "1",
+          pista: "Cuenta cuántas veces aparece cada número.",
+          explicacion: "El 1 aparece 4 veces (1, 1, 1, 1). Es el más frecuente → moda = 1.",
+        },
+        {
+          id: "3-5-4-e3",
+          enunciado: "¿Puede un conjunto de datos no tener moda? ¿Cuándo?",
+          tipo: "texto",
+          respuesta: "Sí, cuando todos los valores aparecen el mismo número de veces",
+          pista: "Piensa en el conjunto: 1, 2, 3, 4, 5. ¿Cuál se repite más?",
+          explicacion: "En 1, 2, 3, 4, 5 cada número aparece 1 sola vez. Ninguno se repite más que otro, así que no hay moda.",
+        },
+        {
+          id: "3-5-4-e4",
+          enunciado: "En una tienda se vendieron: 3 pares de talla 34, 5 de talla 35, 7 de talla 36, 4 de talla 37. ¿Cuál talla es la moda?",
+          tipo: "numero",
+          respuesta: "36",
+          pista: "La moda es la talla que más se vendió.",
+          explicacion: "La talla 36 se vendió 7 veces, más que cualquier otra. La moda es 36.",
+        },
+      ],
+    },
+    {
+      id: "3-5-5",
+      titulo: "Promedio de un conjunto de datos",
+      objetivo: "Calcular el promedio (media aritmética) de un conjunto de datos.",
+      concepto_clave: "Promedio = suma de todos los datos ÷ cantidad de datos.",
+      explicacion: [
+        "El PROMEDIO (o media aritmética) nos da un valor 'típico' o representativo del conjunto. Es como 'repartir' todos los datos en partes iguales.",
+        "Para calcular el promedio: (1) suma todos los datos, (2) divide esa suma entre la cantidad de datos.",
+        "Ejemplo: si 3 niños tienen 4, 6 y 8 canicas, el promedio es (4+6+8)÷3 = 18÷3 = 6 canicas.",
+      ],
+      ejemplos: [
+        {
+          enunciado: "Temperaturas de la semana (°C): 18, 22, 20, 25, 21, 19, 23. ¿Cuál es el promedio?",
+          pasos: [
+            { texto: "Sumo: 18+22+20+25+21+19+23 = 148" },
+            { texto: "Cuento los datos: 7 temperaturas" },
+            { texto: "Promedio: 148 ÷ 7 = 21,14 ≈ 21°C" },
+          ],
+          resultado: "El promedio de temperatura fue aproximadamente 21°C",
+        },
+        {
+          enunciado: "Calificaciones de Valentina: 4.0, 3.5, 4.5, 4.0. ¿Cuál es su promedio?",
+          pasos: [
+            { texto: "Suma: 4.0 + 3.5 + 4.5 + 4.0 = 16.0" },
+            { texto: "Cantidad de notas: 4" },
+            { texto: "Promedio: 16.0 ÷ 4 = 4.0" },
+          ],
+          resultado: "El promedio de Valentina es 4.0",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "3-5-5-e1",
+          enunciado: "Goles anotados en 4 partidos: 2, 4, 1, 5. ¿Cuál es el promedio de goles?",
+          tipo: "numero",
+          respuesta: "3",
+          pista: "Suma: 2+4+1+5=12. Divide entre 4.",
+          explicacion: "(2+4+1+5) ÷ 4 = 12 ÷ 4 = 3 goles en promedio.",
+        },
+        {
+          id: "3-5-5-e2",
+          enunciado: "Altura de 5 plantas en cm: 12, 15, 10, 13, 10. ¿Cuál es la altura promedio?",
+          tipo: "numero",
+          respuesta: "12",
+          pista: "Suma todos y divide entre 5.",
+          explicacion: "(12+15+10+13+10) ÷ 5 = 60 ÷ 5 = 12 cm de promedio.",
+        },
+        {
+          id: "3-5-5-e3",
+          enunciado: "Si el promedio de 3 números es 8 y dos de ellos son 6 y 10, ¿cuál es el tercero?",
+          tipo: "numero",
+          respuesta: "8",
+          pista: "Promedio × cantidad = suma. 8 × 3 = 24. Si dos son 6 y 10, ¿cuánto es el tercero?",
+          explicacion: "Suma total = 8 × 3 = 24. Tercero = 24 - 6 - 10 = 8.",
+        },
+        {
+          id: "3-5-5-e4",
+          enunciado: "¿Cuál es la diferencia entre moda y promedio?",
+          tipo: "texto",
+          respuesta: "La moda es el valor que más se repite; el promedio es la suma dividida entre la cantidad de datos",
+          pista: "La moda se cuenta, el promedio se calcula.",
+          explicacion: "La moda identifica el dato más frecuente. El promedio calcula un valor representativo dividiendo la suma total entre la cantidad de datos.",
+        },
+      ],
+    },
+    {
+      id: "3-5-6",
+      titulo: "Posibilidad de ocurrencia de un evento",
+      objetivo: "Describir la posibilidad de que ocurra un evento como seguro, posible o imposible.",
+      concepto_clave: "Seguro: siempre ocurre. Posible: puede o no ocurrir. Imposible: nunca puede ocurrir.",
+      explicacion: [
+        "La PROBABILIDAD estudia qué tan posible es que ocurra algo. En grado 3 usamos tres categorías: seguro, posible e imposible.",
+        "Un evento es SEGURO cuando siempre va a ocurrir (probabilidad = 1). IMPOSIBLE cuando nunca puede ocurrir (probabilidad = 0). POSIBLE cuando puede o no ocurrir.",
+        "Ejemplo: que mañana salga el sol es posible. Que un número impar sea par es imposible. Que todos los días tengan 24 horas es seguro.",
+      ],
+      ejemplos: [
+        {
+          enunciado: "Clasifica: 'Al lanzar un dado, sacar un número mayor que 6'",
+          pasos: [
+            { texto: "Un dado tiene las caras 1, 2, 3, 4, 5, 6" },
+            { texto: "No hay ningún número mayor que 6 en el dado" },
+          ],
+          resultado: "Es IMPOSIBLE (no puede ocurrir)",
+        },
+        {
+          enunciado: "Clasifica: 'Al lanzar un dado, sacar un número entre 1 y 6'",
+          pasos: [
+            { texto: "Los resultados del dado son: 1, 2, 3, 4, 5, 6" },
+            { texto: "Todos los resultados posibles están entre 1 y 6" },
+          ],
+          resultado: "Es SEGURO (siempre ocurrirá)",
+        },
+        {
+          enunciado: "Clasifica: 'Al lanzar un dado, sacar un número par'",
+          pasos: [
+            { texto: "Números pares en el dado: 2, 4, 6 (3 de 6 caras)" },
+            { texto: "No siempre sale par, pero puede salir" },
+          ],
+          resultado: "Es POSIBLE (puede o no ocurrir)",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "3-5-6-e1",
+          enunciado: "Clasificar: 'Que llueva mañana en tu ciudad'",
+          tipo: "seleccion",
+          opciones: ["Seguro", "Posible", "Imposible"],
+          respuesta: "Posible",
+          pista: "¿Sabes con certeza si lloverá o no mañana?",
+          explicacion: "Que llueva mañana es posible: puede ocurrir o no. No es ni seguro ni imposible.",
+        },
+        {
+          id: "3-5-6-e2",
+          enunciado: "Clasificar: 'Que un estudiante de 8 años sea mayor que uno de 10 años'",
+          tipo: "seleccion",
+          opciones: ["Seguro", "Posible", "Imposible"],
+          respuesta: "Imposible",
+          pista: "8 < 10. ¿Puede el de 8 años ser mayor?",
+          explicacion: "Es imposible: un estudiante de 8 años no puede ser mayor que uno de 10 años.",
+        },
+        {
+          id: "3-5-6-e3",
+          enunciado: "En una bolsa hay 4 fichas rojas y ninguna azul. Clasificar: 'Sacar una ficha azul'",
+          tipo: "seleccion",
+          opciones: ["Seguro", "Posible", "Imposible"],
+          respuesta: "Imposible",
+          pista: "¿Hay fichas azules en la bolsa?",
+          explicacion: "Como no hay fichas azules, es imposible sacar una.",
+        },
+        {
+          id: "3-5-6-e4",
+          enunciado: "En una bolsa hay fichas rojas y azules. Clasificar: 'Sacar una ficha de cualquier color'",
+          tipo: "seleccion",
+          opciones: ["Seguro", "Posible", "Imposible"],
+          respuesta: "Seguro",
+          pista: "¿Qué colores hay en la bolsa? ¿Puede salir algo diferente?",
+          explicacion: "Si solo hay fichas rojas y azules, cualquier ficha que saques será de uno de esos colores. Es seguro.",
+        },
+      ],
+    },
+  ],
+}
+
+export default unidad5

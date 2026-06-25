@@ -1,0 +1,350 @@
+import type { Unidad } from "../tipos"
+
+const unidad6: Unidad = {
+  id: 6,
+  nombre: "Variación y Ecuaciones",
+  descripcion: "Descubre patrones, secuencias y el equilibrio de las ecuaciones.",
+  color: "red",
+  icono: "🔄",
+  lecciones: [
+    {
+      id: "3-6-1",
+      titulo: "Secuencias con patrón aditivo",
+      objetivo: "Identificar y continuar secuencias numéricas con patrón aditivo.",
+      concepto_clave: "En una secuencia aditiva, cada término se obtiene sumando (o restando) siempre el mismo número.",
+      explicacion: [
+        "Una SECUENCIA es una lista de números que siguen un orden. Cuando el patrón es sumar o restar siempre el mismo número, se llama patrón ADITIVO.",
+        "Para encontrar el patrón: mira la diferencia entre términos consecutivos. ¿Es siempre igual?",
+        "Ejemplo: 5, 8, 11, 14, 17... → el patrón es +3 (se suma 3 cada vez).",
+      ],
+      ejemplos: [
+        {
+          enunciado: "Encuentra el patrón y continúa: 10, 17, 24, 31, ___",
+          pasos: [
+            { texto: "17 - 10 = 7" },
+            { texto: "24 - 17 = 7" },
+            { texto: "31 - 24 = 7 → patrón: +7" },
+            { texto: "Siguiente: 31 + 7 = 38" },
+          ],
+          resultado: "El patrón es +7. El siguiente número es 38.",
+        },
+        {
+          enunciado: "Encuentra el patrón: 50, 43, 36, 29, ___",
+          pasos: [
+            { texto: "43 - 50 = -7" },
+            { texto: "36 - 43 = -7 → patrón: -7 (resta 7)" },
+            { texto: "Siguiente: 29 - 7 = 22" },
+          ],
+          resultado: "El patrón es -7. El siguiente número es 22.",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "3-6-1-e1",
+          enunciado: "Continúa la secuencia: 3, 7, 11, 15, ___",
+          tipo: "numero",
+          respuesta: "19",
+          pista: "Calcula la diferencia entre los términos: 7-3=?, 11-7=?",
+          explicacion: "Patrón: +4. 15 + 4 = 19.",
+        },
+        {
+          id: "3-6-1-e2",
+          enunciado: "¿Cuál es el patrón de: 100, 85, 70, 55, 40?",
+          tipo: "seleccion",
+          opciones: ["+15", "-15", "+10", "-10"],
+          respuesta: "-15",
+          pista: "Resta el primer del segundo: 85 - 100 = ?",
+          explicacion: "85-100=-15. La secuencia resta 15 cada vez. Patrón: -15.",
+        },
+        {
+          id: "3-6-1-e3",
+          enunciado: "¿Cuál es el 6to término de la secuencia: 2, 6, 10, 14, ...?",
+          tipo: "numero",
+          respuesta: "22",
+          pista: "Patrón +4. Lista: 2, 6, 10, 14, 18, ___",
+          explicacion: "Patrón: +4. Términos: 2, 6, 10, 14, 18, 22. El 6to es 22.",
+        },
+        {
+          id: "3-6-1-e4",
+          enunciado: "Una araña teje 5 hilos por hora. Si empezó con 3 hilos, ¿cuántos tendrá después de 4 horas?",
+          tipo: "numero",
+          respuesta: "23",
+          pista: "Empieza en 3 y suma 5 cuatro veces: 3, 8, 13, 18, 23.",
+          explicacion: "Secuencia: 3, 8, 13, 18, 23. Después de 4 horas tendrá 23 hilos.",
+        },
+      ],
+    },
+    {
+      id: "3-6-2",
+      titulo: "Secuencias con patrón multiplicativo",
+      objetivo: "Identificar y continuar secuencias con patrón multiplicativo.",
+      concepto_clave: "En una secuencia multiplicativa, cada término se obtiene multiplicando (o dividiendo) por el mismo número.",
+      explicacion: [
+        "En las secuencias con patrón MULTIPLICATIVO, cada término se obtiene multiplicando el anterior por un número fijo (llamado razón).",
+        "Para encontrar el patrón: divide un término entre el anterior. ¿Da siempre el mismo número?",
+        "Ejemplo: 3, 6, 12, 24, 48... → dividimos: 6÷3=2, 12÷6=2, 24÷12=2. Patrón: ×2.",
+      ],
+      ejemplos: [
+        {
+          enunciado: "Continúa: 5, 15, 45, 135, ___",
+          pasos: [
+            { texto: "15 ÷ 5 = 3" },
+            { texto: "45 ÷ 15 = 3" },
+            { texto: "135 ÷ 45 = 3 → patrón: ×3" },
+            { texto: "Siguiente: 135 × 3 = 405" },
+          ],
+          resultado: "El patrón es ×3. El siguiente es 405.",
+        },
+        {
+          enunciado: "¿Es aditivo o multiplicativo el patrón: 2, 4, 8, 16, 32?",
+          pasos: [
+            { texto: "Diferencias: 4-2=2, 8-4=4, 16-8=8 → no es constante → NO es aditivo" },
+            { texto: "Razones: 4÷2=2, 8÷4=2, 16÷8=2 → siempre 2 → ES multiplicativo" },
+          ],
+          resultado: "Es multiplicativo con razón ×2",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "3-6-2-e1",
+          enunciado: "Continúa: 4, 12, 36, 108, ___",
+          tipo: "numero",
+          respuesta: "324",
+          pista: "Divide términos consecutivos para encontrar la razón.",
+          explicacion: "Razón: 12÷4=3. Patrón ×3. 108 × 3 = 324.",
+        },
+        {
+          id: "3-6-2-e2",
+          enunciado: "¿Cuál es la razón en: 1, 5, 25, 125, 625?",
+          tipo: "numero",
+          respuesta: "5",
+          pista: "Divide el segundo entre el primero: 5 ÷ 1.",
+          explicacion: "5÷1=5. La razón es ×5.",
+        },
+        {
+          id: "3-6-2-e3",
+          enunciado: "Una bacteria se duplica cada hora. Si hay 1 bacteria al inicio, ¿cuántas hay después de 5 horas?",
+          tipo: "numero",
+          respuesta: "32",
+          pista: "Secuencia: 1, 2, 4, 8, 16, ___",
+          explicacion: "1×2=2, 2×2=4, 4×2=8, 8×2=16, 16×2=32. Después de 5 horas hay 32 bacterias.",
+        },
+        {
+          id: "3-6-2-e4",
+          enunciado: "¿En qué se diferencia una secuencia aditiva de una multiplicativa?",
+          tipo: "texto",
+          respuesta: "En la aditiva se suma o resta siempre el mismo número; en la multiplicativa se multiplica o divide por el mismo número",
+          pista: "Piensa en las operaciones que se usan en cada una.",
+          explicacion: "Aditiva: cada término = anterior + constante. Multiplicativa: cada término = anterior × constante.",
+        },
+      ],
+    },
+    {
+      id: "3-6-3",
+      titulo: "El cambio y la variación",
+      objetivo: "Reconocer situaciones de variación y describir cómo una magnitud cambia en relación con otra.",
+      concepto_clave: "Variación: cuando una magnitud cambia, la otra también cambia de manera predecible.",
+      explicacion: [
+        "En el mundo real, muchas cosas cambian juntas: si compras más frutas, gastas más dinero. Si caminas más rápido, llegas antes. A esto lo llamamos VARIACIÓN.",
+        "Cuando al aumentar una cantidad también aumenta la otra, hay VARIACIÓN DIRECTA. Si al aumentar una disminuye la otra, es VARIACIÓN INVERSA.",
+        "Ejemplo directo: más horas trabajadas → más dinero ganado. Ejemplo inverso: más personas trabajando → menos días para terminar.",
+      ],
+      ejemplos: [
+        {
+          enunciado: "Una tienda vende mangos a $500 cada uno. Completa: 1 mango=$500, 2=$1.000, 3=?, 4=?",
+          pasos: [
+            { texto: "Patrón: precio = 500 × número de mangos" },
+            { texto: "3 mangos: 500 × 3 = $1.500" },
+            { texto: "4 mangos: 500 × 4 = $2.000" },
+          ],
+          resultado: "3 mangos=$1.500 | 4 mangos=$2.000 (variación directa)",
+        },
+        {
+          enunciado: "¿Es directa o inversa? 'Más velocidad → menos tiempo para llegar'",
+          pasos: [
+            { texto: "Cuando velocidad AUMENTA → tiempo DISMINUYE" },
+            { texto: "Las magnitudes van en sentidos opuestos" },
+          ],
+          resultado: "Es VARIACIÓN INVERSA",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "3-6-3-e1",
+          enunciado: "Si 1 cuaderno cuesta $2.500, ¿cuánto cuestan 6 cuadernos?",
+          tipo: "numero",
+          respuesta: "15000",
+          pista: "Multiplica el precio por la cantidad: 2.500 × 6.",
+          explicacion: "$2.500 × 6 = $15.000.",
+        },
+        {
+          id: "3-6-3-e2",
+          enunciado: "¿'Más lluvia → más cosecha' es variación directa o inversa?",
+          tipo: "seleccion",
+          opciones: ["Directa (las dos aumentan juntas)", "Inversa (una sube, la otra baja)"],
+          respuesta: "Directa (las dos aumentan juntas)",
+          pista: "Cuando llueve más, ¿qué pasa con la cosecha?",
+          explicacion: "Más lluvia produce más cosecha. Ambas magnitudes aumentan juntas: variación directa.",
+        },
+        {
+          id: "3-6-3-e3",
+          enunciado: "Una vela de 30 cm se consume 2 cm por hora. ¿Cuánto mide después de 4 horas?",
+          tipo: "numero",
+          respuesta: "22",
+          pista: "Empieza en 30 cm y resta 2 cm por cada hora.",
+          explicacion: "30 - (2×4) = 30 - 8 = 22 cm después de 4 horas.",
+        },
+        {
+          id: "3-6-3-e4",
+          enunciado: "¿Cuántos trabajadores hay si 3 trabajadores hacen 1 casita en 12 días y queremos hacerla en 4 días?",
+          tipo: "numero",
+          respuesta: "9",
+          pista: "Más trabajadores → menos días. Si los días se dividen por 3, los trabajadores se multiplican por 3.",
+          explicacion: "12 días ÷ 3 = 4 días. Trabajadores: 3 × 3 = 9 trabajadores (variación inversa).",
+        },
+      ],
+    },
+    {
+      id: "3-6-4",
+      titulo: "Igualdades",
+      objetivo: "Comprender el signo igual como equilibrio y verificar igualdades.",
+      concepto_clave: "Una igualdad es verdadera cuando ambos lados del signo = tienen el mismo valor.",
+      explicacion: [
+        "El signo = (igual) significa que lo que hay a su izquierda y a su derecha tienen el mismo valor. Es como una balanza: los dos lados deben pesar lo mismo.",
+        "Una igualdad puede ser verdadera (3 + 2 = 5) o falsa (3 + 2 = 6). Debemos verificarla calculando ambos lados.",
+        "Las igualdades pueden tener operaciones en uno o ambos lados: 4 × 3 = 6 × 2 (ambos valen 12, es verdadera).",
+      ],
+      ejemplos: [
+        {
+          enunciado: "¿Es verdadera? 5 × 4 = 3 × 7",
+          pasos: [
+            { texto: "Lado izquierdo: 5 × 4 = 20" },
+            { texto: "Lado derecho: 3 × 7 = 21" },
+            { texto: "20 ≠ 21" },
+          ],
+          resultado: "Es FALSA: 20 ≠ 21",
+        },
+        {
+          enunciado: "¿Es verdadera? 24 ÷ 4 = 2 × 3",
+          pasos: [
+            { texto: "Lado izquierdo: 24 ÷ 4 = 6" },
+            { texto: "Lado derecho: 2 × 3 = 6" },
+            { texto: "6 = 6 ✓" },
+          ],
+          resultado: "Es VERDADERA: ambos lados valen 6",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "3-6-4-e1",
+          enunciado: "¿Es verdadera la igualdad? 4 + 8 = 3 × 4",
+          tipo: "seleccion",
+          opciones: ["Verdadera", "Falsa"],
+          respuesta: "Verdadera",
+          pista: "Calcula ambos lados: 4+8=? y 3×4=?",
+          explicacion: "4+8=12 y 3×4=12. Como 12=12, es VERDADERA.",
+        },
+        {
+          id: "3-6-4-e2",
+          enunciado: "¿Qué número hace verdadera la igualdad? 3 × ___ = 5 + 7",
+          tipo: "numero",
+          respuesta: "4",
+          pista: "Primero calcula el lado derecho: 5+7=12. Luego: 3 × ? = 12.",
+          explicacion: "5+7=12. Entonces 3 × ? = 12 → ? = 12 ÷ 3 = 4.",
+        },
+        {
+          id: "3-6-4-e3",
+          enunciado: "¿Por qué una balanza es un buen símbolo para explicar las igualdades?",
+          tipo: "texto",
+          respuesta: "Porque en la balanza los dos lados deben pesar igual, igual que en una igualdad los dos lados deben tener el mismo valor",
+          pista: "Piensa en qué pasa cuando los dos lados de una balanza están equilibrados.",
+          explicacion: "Una balanza está equilibrada cuando los dos platillos pesan igual. Las igualdades son lo mismo: el signo = indica equilibrio entre los dos lados.",
+        },
+        {
+          id: "3-6-4-e4",
+          enunciado: "Completa para que la igualdad sea verdadera: 36 ÷ ___ = 4 × 3",
+          tipo: "numero",
+          respuesta: "3",
+          pista: "4 × 3 = 12. Entonces 36 ÷ ? = 12. ¿Por qué divido 36 para obtener 12?",
+          explicacion: "4×3=12. Entonces 36 ÷ ? = 12. ? = 36 ÷ 12 = 3.",
+        },
+      ],
+    },
+    {
+      id: "3-6-5",
+      titulo: "Ecuaciones",
+      objetivo: "Resolver ecuaciones simples encontrando el valor de la incógnita.",
+      concepto_clave: "Una ecuación tiene una incógnita (variable desconocida). Resolverla es encontrar qué valor hace la igualdad verdadera.",
+      explicacion: [
+        "Una ECUACIÓN es una igualdad que tiene un número desconocido, llamado INCÓGNITA. Lo representamos con una letra (x, n) o con un cuadro □.",
+        "Resolver la ecuación significa encontrar el valor de la incógnita que hace verdadera la igualdad.",
+        "Estrategias: (1) Pensamiento inverso: si n + 5 = 12, pienso '¿a qué le sumo 5 para obtener 12?' → n = 7. (2) Verificar: sustituyo y compruebo.",
+      ],
+      ejemplos: [
+        {
+          enunciado: "Resuelve: n + 8 = 15",
+          pasos: [
+            { texto: "Pregunta: ¿qué número + 8 = 15?" },
+            { texto: "Operación inversa: 15 - 8 = 7" },
+            { texto: "Verificación: 7 + 8 = 15 ✓" },
+          ],
+          resultado: "n = 7",
+        },
+        {
+          enunciado: "Resuelve: 4 × □ = 28",
+          pasos: [
+            { texto: "Pregunta: ¿4 por qué número = 28?" },
+            { texto: "Operación inversa: 28 ÷ 4 = 7" },
+            { texto: "Verificación: 4 × 7 = 28 ✓" },
+          ],
+          resultado: "□ = 7",
+        },
+        {
+          enunciado: "Resuelve: 30 - x = 13",
+          pasos: [
+            { texto: "30 menos qué número = 13?" },
+            { texto: "x = 30 - 13 = 17" },
+            { texto: "Verificación: 30 - 17 = 13 ✓" },
+          ],
+          resultado: "x = 17",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "3-6-5-e1",
+          enunciado: "Resuelve: n + 14 = 30",
+          tipo: "numero",
+          respuesta: "16",
+          pista: "Operación inversa: 30 - 14 = ?",
+          explicacion: "n = 30 - 14 = 16. Verificación: 16 + 14 = 30 ✓",
+        },
+        {
+          id: "3-6-5-e2",
+          enunciado: "Resuelve: 5 × x = 45",
+          tipo: "numero",
+          respuesta: "9",
+          pista: "Operación inversa de multiplicar es dividir: 45 ÷ 5 = ?",
+          explicacion: "x = 45 ÷ 5 = 9. Verificación: 5 × 9 = 45 ✓",
+        },
+        {
+          id: "3-6-5-e3",
+          enunciado: "En una caja hay algunas manzanas. Si sacas 7, quedan 12. ¿Cuántas había?",
+          tipo: "numero",
+          respuesta: "19",
+          pista: "Escribe la ecuación: n - 7 = 12. Luego resuélvela.",
+          explicacion: "n - 7 = 12 → n = 12 + 7 = 19 manzanas.",
+        },
+        {
+          id: "3-6-5-e4",
+          enunciado: "Resuelve: 72 ÷ n = 8",
+          tipo: "numero",
+          respuesta: "9",
+          pista: "Operación inversa de dividir es multiplicar: n = 72 ÷ 8.",
+          explicacion: "72 ÷ n = 8 → n = 72 ÷ 8 = 9. Verificación: 72 ÷ 9 = 8 ✓",
+        },
+      ],
+    },
+  ],
+}
+
+export default unidad6

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { temasPorGrado, Grado } from "@/lib/curriculo";
 import { MensajeChat } from "@/app/components/MensajeChat";
@@ -15,6 +15,7 @@ const LIMITE_GRATIS = 5;
 
 export default function TutorPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isLoaded, isSignedIn } = useUser();
 
   const [perfil, setPerfil] = useState<Perfil | null>(null);
@@ -41,6 +42,17 @@ export default function TutorPage() {
         if (!d || !d.onboarding_completado) { router.push("/configurar"); return; }
         setPerfil(d);
         setGrado(d.grado as Grado);
+        // Si viene desde /clases con ?tema=, lo pre-carga
+        const temaParam = searchParams.get("tema");
+        const contextoParam = searchParams.get("contexto");
+        if (temaParam) {
+          setTemaNombre(temaParam);
+          setTemaId("clase-" + temaParam);
+          const saludo = contextoParam
+            ? `¡Hola ${d.nombre_hijo ?? ""}! Estoy aquí para ayudarte con: **${temaParam}**. ¿Qué parte no entendiste o cuál ejercicio tienes?`
+            : `¡Hola ${d.nombre_hijo ?? ""}! Vamos con ${temaParam}. ¿Qué ejercicio o duda tienes?`;
+          setMensajes([{ role: "assistant", content: saludo }]);
+        }
       });
   }, [isLoaded, isSignedIn, router]);
 
@@ -147,7 +159,10 @@ export default function TutorPage() {
       <main className="contenedor">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Link href="/" className="nota">← Inicio</Link>
-          <Link href="/padres" className="nota">Ver avance →</Link>
+          <div style={{ display: "flex", gap: 12 }}>
+            <Link href="/clases" className="nota">📚 Clases</Link>
+            <Link href="/padres" className="nota">Ver avance →</Link>
+          </div>
         </div>
         <h1 style={{ fontSize: 28, margin: "12px 0 18px" }}>
           {perfil.nombre_hijo}, ¿con qué <span className="marca">tema</span> necesitas ayuda?
