@@ -1,7 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import { GRADO3 } from "@/lib/clases"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useUser } from "@clerk/nextjs"
+import { getCurriculo } from "@/lib/clases"
+import type { Curriculo } from "@/lib/clases"
 
 const COLORES = [
   { fondo: "#e8f4fd", borde: "#2980b9", texto: "#1a5276" },
@@ -13,7 +17,35 @@ const COLORES = [
 ]
 
 export default function ClasesPage() {
-  const totalLecciones = GRADO3.unidades.reduce((a, u) => a + u.lecciones.length, 0)
+  const router = useRouter()
+  const { isLoaded, isSignedIn } = useUser()
+  const [curriculo, setCurriculo] = useState<Curriculo | null>(null)
+  const [grado, setGrado] = useState<number>(3)
+  const [cargando, setCargando] = useState(true)
+
+  useEffect(() => {
+    if (!isLoaded) return
+    if (!isSignedIn) { router.push("/sign-in"); return }
+    fetch("/api/perfil")
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => {
+        if (!d || !d.onboarding_completado) { router.push("/configurar"); return }
+        const gradoNum = Number(d.grado) || 3
+        setGrado(gradoNum)
+        setCurriculo(getCurriculo(gradoNum) ?? getCurriculo(3))
+        setCargando(false)
+      })
+  }, [isLoaded, isSignedIn, router])
+
+  if (cargando) {
+    return <main className="contenedor"><p className="nota">Cargando clases…</p></main>
+  }
+
+  if (!curriculo) {
+    return <main className="contenedor"><p className="nota">No hay clases disponibles para este grado aún.</p></main>
+  }
+
+  const totalLecciones = curriculo.unidades.reduce((a, u) => a + u.lecciones.length, 0)
 
   return (
     <main className="contenedor">
@@ -27,17 +59,17 @@ export default function ClasesPage() {
         📚 <span className="marca">Clases</span> de Matemáticas
       </h1>
       <p className="nota" style={{ marginBottom: 28 }}>
-        Grado 3 · {GRADO3.unidades.length} unidades · {totalLecciones} lecciones
+        {curriculo.titulo} · {curriculo.unidades.length} unidades · {totalLecciones} lecciones
       </p>
 
       {/* Grid de unidades */}
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {GRADO3.unidades.map((unidad, i) => {
+        {curriculo.unidades.map((unidad, i) => {
           const col = COLORES[i % COLORES.length]
           return (
             <Link
               key={unidad.id}
-              href={`/clases/${unidad.id}`}
+              href={`/clases/${grado}/${unidad.id}`}
               style={{
                 display: "flex",
                 alignItems: "center",

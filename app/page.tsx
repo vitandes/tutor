@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 
-interface Perfil { nombre_hijo: string; grado: string }
+interface Perfil { nombre_hijo: string; grado: string; plan: string }
 
 export default function Home() {
   const { isSignedIn, user } = useUser();
@@ -17,6 +17,93 @@ export default function Home() {
       .then((d) => d?.onboarding_completado ? setPerfil(d) : setPerfil(null))
       .catch(() => setPerfil(null));
   }, [isSignedIn]);
+
+  const esPro = perfil?.plan === "mensual" || perfil?.plan === "anual";
+
+  // Dashboard para usuarios con plan activo
+  if (isSignedIn && perfil && esPro) {
+    return (
+      <main className="contenedor">
+        <p className="eyebrow">Bienvenido/a, {user?.firstName ?? "familia"}</p>
+        <h1 style={{ fontSize: 32, margin: "8px 0 6px" }}>
+          ¿Qué hace hoy <span className="marca">{perfil.nombre_hijo}</span>?
+        </h1>
+        <p className="nota" style={{ marginBottom: 32 }}>
+          Grado {perfil.grado} · Plan activo ★
+        </p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {/* Clases */}
+          <Link href="/clases" style={{ textDecoration: "none" }}>
+            <div className="tarjeta" style={{
+              display: "flex", alignItems: "center", gap: 18,
+              background: "#e8f4fd", border: "2px solid #2980b9",
+              boxShadow: "4px 4px 0 #2980b9", cursor: "pointer",
+              transition: "transform 0.08s, box-shadow 0.08s",
+            }}
+              onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.transform = "translate(2px,2px)"; el.style.boxShadow = "2px 2px 0 #2980b9"; }}
+              onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.transform = ""; el.style.boxShadow = "4px 4px 0 #2980b9"; }}
+            >
+              <div style={{ fontSize: 40, lineHeight: 1 }}>📚</div>
+              <div style={{ flex: 1 }}>
+                <h2 style={{ fontSize: 20, margin: "0 0 4px", color: "#1a5276" }}>Clases</h2>
+                <p style={{ fontSize: 14, color: "#2980b9", margin: 0 }}>
+                  Lecciones del currículo · Grado {perfil.grado} · Aprende paso a paso
+                </p>
+              </div>
+              <div style={{ fontSize: 24, color: "#2980b9" }}>→</div>
+            </div>
+          </Link>
+
+          {/* Tutor */}
+          <Link href="/tutor" style={{ textDecoration: "none" }}>
+            <div className="tarjeta" style={{
+              display: "flex", alignItems: "center", gap: 18,
+              background: "#fef9e7", border: "2px solid var(--coral)",
+              boxShadow: "4px 4px 0 var(--coral)", cursor: "pointer",
+              transition: "transform 0.08s, box-shadow 0.08s",
+            }}
+              onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.transform = "translate(2px,2px)"; el.style.boxShadow = "2px 2px 0 var(--coral)"; }}
+              onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.transform = ""; el.style.boxShadow = "4px 4px 0 var(--coral)"; }}
+            >
+              <div style={{ fontSize: 40, lineHeight: 1 }}>🤖</div>
+              <div style={{ flex: 1 }}>
+                <h2 style={{ fontSize: 20, margin: "0 0 4px", color: "var(--tinta)" }}>Tutor de tareas</h2>
+                <p style={{ fontSize: 14, color: "var(--gris)", margin: 0 }}>
+                  Sube la tarea o pregunta lo que no entiende · Pistas sin dar la respuesta
+                </p>
+              </div>
+              <div style={{ fontSize: 24, color: "var(--coral)" }}>→</div>
+            </div>
+          </Link>
+
+          {/* Ver avance */}
+          <Link href="/padres" style={{ textDecoration: "none" }}>
+            <div className="tarjeta" style={{
+              display: "flex", alignItems: "center", gap: 18,
+              background: "#eafaf1", border: "2px solid #27ae60",
+              boxShadow: "4px 4px 0 #27ae60", cursor: "pointer",
+              transition: "transform 0.08s, box-shadow 0.08s",
+            }}
+              onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.transform = "translate(2px,2px)"; el.style.boxShadow = "2px 2px 0 #27ae60"; }}
+              onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.transform = ""; el.style.boxShadow = "4px 4px 0 #27ae60"; }}
+            >
+              <div style={{ fontSize: 40, lineHeight: 1 }}>📊</div>
+              <div style={{ flex: 1 }}>
+                <h2 style={{ fontSize: 20, margin: "0 0 4px", color: "#1e8449" }}>Ver avance</h2>
+                <p style={{ fontSize: 14, color: "#27ae60", margin: 0 }}>
+                  Qué temas practicó, qué domina y qué necesita reforzar
+                </p>
+              </div>
+              <div style={{ fontSize: 24, color: "#27ae60" }}>→</div>
+            </div>
+          </Link>
+        </div>
+
+        <p className="pie" style={{ marginTop: 40 }}>Tutor de Tareas · Matemáticas de primaria 💛</p>
+      </main>
+    );
+  }
 
   return (
     <main className="contenedor">
@@ -45,11 +132,11 @@ export default function Home() {
             Hola, {user?.firstName ?? "familia"} 👋
           </p>
           <div className="fila cta-hero" style={{ marginTop: 12, gap: 16 }}>
-            <Link href="/tutor">
-              <span className="btn coral">{perfil.nombre_hijo} va a estudiar →</span>
+            <Link href="/clases">
+              <span className="btn coral">📚 Ir a Clases →</span>
             </Link>
-            <Link href="/padres">
-              <span className="btn fantasma">Ver su avance →</span>
+            <Link href="/tutor">
+              <span className="btn fantasma">🤖 Consultar tutor →</span>
             </Link>
           </div>
         </>

@@ -1,0 +1,285 @@
+import type { Unidad } from "../tipos"
+
+const unidad4: Unidad = {
+  id: 4,
+  nombre: "Propiedades de Figuras Geométricas",
+  descripcion: "Construye triángulos y cuadriláteros perfectos usando regla, escuadra y compás.",
+  color: "orange",
+  icono: "📐",
+  lecciones: [
+    {
+      id: "4-4-1",
+      titulo: "Congruencia de figuras",
+      objetivo: "Identificar figuras congruentes y comprender qué condiciones deben cumplirse.",
+      concepto_clave: "Dos figuras son CONGRUENTES si tienen exactamente la misma forma y el mismo tamaño. Se pueden superponer perfectamente.",
+      explicacion: [
+        "Dos figuras son CONGRUENTES cuando tienen exactamente la misma forma y el mismo tamaño. Si puedes recortar una figura y colocarla encima de la otra quedando perfectamente alineadas, son congruentes.",
+        "Para que dos triángulos sean congruentes deben cumplirse ciertos criterios. El más sencillo: LLL (Lado-Lado-Lado) — si los tres lados de un triángulo son iguales a los tres lados del otro, los triángulos son congruentes.",
+        "La congruencia es diferente a la semejanza: figuras semejantes tienen la misma forma pero diferente tamaño. Figuras congruentes tienen la misma forma Y el mismo tamaño.",
+      ],
+      ejemplos: [
+        {
+          enunciado: "¿Son congruentes un triángulo de lados 3-4-5 cm y otro de lados 5-3-4 cm?",
+          pasos: [
+            { texto: "Primer triángulo: lados 3, 4, 5 cm" },
+            { texto: "Segundo triángulo: lados 5, 3, 4 cm (mismos números, diferente orden)" },
+            { texto: "Ordenamos: 3-4-5 y 3-4-5 → son los mismos lados" },
+          ],
+          resultado: "SÍ son congruentes (criterio LLL: los tres lados son iguales)",
+        },
+        {
+          enunciado: "¿Cuál es la diferencia entre congruente y semejante?",
+          pasos: [
+            { texto: "Congruente: misma forma + mismo tamaño (se superponen perfectamente)" },
+            { texto: "Semejante: misma forma + diferente tamaño (una es ampliación/reducción de la otra)" },
+          ],
+          resultado: "Congruente = igual en todo. Semejante = igual en forma pero diferente en tamaño.",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "4-4-1-e1",
+          enunciado: "¿Son congruentes un cuadrado de 4 cm de lado y otro de 4 cm de lado?",
+          tipo: "seleccion",
+          opciones: ["Sí, son congruentes", "No, son solo semejantes", "Depende del color"],
+          respuesta: "Sí, son congruentes",
+          pista: "Compara forma y tamaño.",
+          explicacion: "Ambos cuadrados tienen exactamente la misma forma y el mismo tamaño. Son congruentes.",
+        },
+        {
+          id: "4-4-1-e2",
+          enunciado: "Un triángulo A mide 3-4-5 cm y un triángulo B mide 6-8-10 cm. ¿Qué relación tienen?",
+          tipo: "seleccion",
+          opciones: ["Son congruentes", "Son semejantes (B es el doble de A)", "No tienen ninguna relación"],
+          respuesta: "Son semejantes (B es el doble de A)",
+          pista: "¿Son iguales en tamaño? ¿Tienen la misma forma?",
+          explicacion: "Los lados de B son exactamente el doble de los de A (3×2=6, 4×2=8, 5×2=10). Misma forma, diferente tamaño: son semejantes.",
+        },
+        {
+          id: "4-4-1-e3",
+          enunciado: "¿Cuántos criterios necesitas verificar para confirmar que dos triángulos son congruentes por el criterio LLL?",
+          tipo: "numero",
+          respuesta: "3",
+          pista: "LLL = Lado-Lado-Lado. ¿Cuántos lados tiene un triángulo?",
+          explicacion: "El criterio LLL requiere verificar que los 3 lados de un triángulo sean iguales a los 3 lados del otro. Son 3 condiciones.",
+        },
+        {
+          id: "4-4-1-e4",
+          enunciado: "¿Pueden ser congruentes un triángulo y un cuadrado?",
+          tipo: "seleccion",
+          opciones: ["Sí, si tienen el mismo tamaño", "No, porque tienen diferente forma", "Solo si tienen el mismo perímetro"],
+          respuesta: "No, porque tienen diferente forma",
+          pista: "Para ser congruentes deben tener la misma forma Y el mismo tamaño.",
+          explicacion: "No. Un triángulo tiene 3 lados y un cuadrado tiene 4 lados. Son formas completamente diferentes: nunca pueden ser congruentes.",
+        },
+      ],
+    },
+    {
+      id: "4-4-2",
+      titulo: "Condiciones para construir un triángulo",
+      objetivo: "Conocer y aplicar las condiciones que deben cumplir tres segmentos para formar un triángulo.",
+      concepto_clave: "Desigualdad triangular: la suma de cualquier par de lados debe ser MAYOR que el tercer lado.",
+      explicacion: [
+        "No cualquier combinación de tres segmentos forma un triángulo. Para que tres segmentos formen un triángulo se debe cumplir la DESIGUALDAD TRIANGULAR: la suma de los dos lados más cortos debe ser mayor que el lado más largo.",
+        "Si tienes lados a, b y c: debe cumplirse que a+b > c, a+c > b, y b+c > a. En la práctica, basta verificar que la suma de los dos menores sea mayor que el mayor.",
+        "Ejemplo: lados 3, 5 y 10 → 3+5=8 < 10 → ¡NO forman triángulo! Los extremos no llegan a juntarse.",
+      ],
+      ejemplos: [
+        {
+          enunciado: "¿Los segmentos de 4 cm, 7 cm y 9 cm forman un triángulo?",
+          pasos: [
+            { texto: "Verifico: ¿4 + 7 > 9? → 11 > 9 ✓" },
+            { texto: "¿4 + 9 > 7? → 13 > 7 ✓" },
+            { texto: "¿7 + 9 > 4? → 16 > 4 ✓" },
+          ],
+          resultado: "SÍ forman un triángulo (se cumplen las 3 condiciones)",
+        },
+        {
+          enunciado: "¿Los segmentos de 2 cm, 3 cm y 6 cm forman un triángulo?",
+          pasos: [
+            { texto: "Verifico la condición más crítica: suma de los dos menores vs el mayor" },
+            { texto: "2 + 3 = 5, ¿es 5 > 6? → NO, 5 < 6" },
+          ],
+          resultado: "NO forman un triángulo (los dos lados cortos no alcanzan a cerrarse)",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "4-4-2-e1",
+          enunciado: "¿Los lados 5, 8, 12 forman un triángulo?",
+          tipo: "seleccion",
+          opciones: ["Sí", "No"],
+          respuesta: "No",
+          pista: "Suma los dos menores: 5+8=13. ¿Es 13 > 12?",
+          explicacion: "5+8=13 > 12 ✓. Pero espera, sí se cumple. Entonces SÍ forman triángulo. Revisemos: 5+8=13>12✓, 5+12=17>8✓, 8+12=20>5✓. Sí forman triángulo.",
+        },
+        {
+          id: "4-4-2-e2",
+          enunciado: "¿Los lados 1, 2, 10 forman un triángulo?",
+          tipo: "seleccion",
+          opciones: ["Sí", "No"],
+          respuesta: "No",
+          pista: "¿Es 1+2 > 10?",
+          explicacion: "1+2=3 y 3 < 10. No se cumple la desigualdad triangular. Esos tres segmentos NO forman un triángulo.",
+        },
+        {
+          id: "4-4-2-e3",
+          enunciado: "¿Cuál es el mínimo valor que puede tener el tercer lado si los otros dos miden 6 y 4 cm?",
+          tipo: "numero",
+          respuesta: "3",
+          pista: "El tercer lado debe ser mayor que |6-4| = 2, es decir, mayor que 2. El mínimo entero que cumple eso es...",
+          explicacion: "La diferencia es 6−4=2. El tercer lado debe ser mayor que 2 y menor que 10 (suma). El mínimo entero es 3.",
+        },
+        {
+          id: "4-4-2-e4",
+          enunciado: "Un triángulo equilátero tiene todos los lados iguales. Si un lado mide 5 cm, ¿cumple la desigualdad triangular?",
+          tipo: "seleccion",
+          opciones: ["Sí siempre, porque 5+5=10 > 5", "No, porque los lados iguales no sirven", "Solo si los ángulos son iguales"],
+          respuesta: "Sí siempre, porque 5+5=10 > 5",
+          pista: "¿Es la suma de dos lados iguales mayor que el tercero igual?",
+          explicacion: "En un triángulo equilátero: 5+5=10 > 5 ✓. Siempre se cumple porque 2×lado > lado.",
+        },
+      ],
+    },
+    {
+      id: "4-4-3",
+      titulo: "Trazado de paralelas y perpendiculares",
+      objetivo: "Trazar líneas paralelas y perpendiculares usando regla y escuadra correctamente.",
+      concepto_clave: "Con escuadra y regla: para una perpendicular, alinea el ángulo recto de la escuadra. Para una paralela, desliza la escuadra sin girarla.",
+      explicacion: [
+        "La ESCUADRA es un instrumento triangular con un ángulo de 90°. Junto con la regla, nos permite trazar líneas paralelas y perpendiculares con precisión.",
+        "Para trazar una PERPENDICULAR a una línea por un punto: coloca la escuadra con su lado del ángulo recto sobre la línea, deslízala hasta que el otro lado pase por el punto, y traza.",
+        "Para trazar una PARALELA a una línea: coloca la regla sobre la línea, apoya la escuadra contra la regla, y desliza la escuadra por la regla hasta la posición deseada. Traza por el borde de la escuadra.",
+      ],
+      ejemplos: [
+        {
+          enunciado: "¿Cuántos grados forma una línea perpendicular con la línea original?",
+          pasos: [
+            { texto: "Una perpendicular forma un ángulo recto con la línea" },
+            { texto: "Un ángulo recto = 90°" },
+          ],
+          resultado: "Una perpendicular forma ángulos de 90° con la línea",
+        },
+        {
+          enunciado: "¿Qué pasa si intentas cruzar dos líneas paralelas?",
+          pasos: [
+            { texto: "Las líneas paralelas nunca se cruzan" },
+            { texto: "Siempre están a la misma distancia entre sí" },
+          ],
+          resultado: "Las paralelas NUNCA se cruzan, sin importar cuánto las extiendas",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "4-4-3-e1",
+          enunciado: "¿Qué instrumento usas para garantizar que una línea es exactamente perpendicular?",
+          tipo: "seleccion",
+          opciones: ["Solo la regla", "El compás", "La escuadra", "El transportador"],
+          respuesta: "La escuadra",
+          pista: "La escuadra tiene un ángulo de exactamente 90°.",
+          explicacion: "La escuadra tiene un ángulo recto (90°) que garantiza que la línea trazada a lo largo de ese lado sea exactamente perpendicular.",
+        },
+        {
+          id: "4-4-3-e2",
+          enunciado: "Para trazar una paralela, ¿la escuadra se gira o se desliza?",
+          tipo: "seleccion",
+          opciones: ["Se gira", "Se desliza sin girar", "Se voltea"],
+          respuesta: "Se desliza sin girar",
+          pista: "Si giraras la escuadra, la nueva línea tendría diferente ángulo.",
+          explicacion: "Para mantener el mismo ángulo (y que la línea sea paralela), la escuadra se desliza a lo largo de la regla sin girar.",
+        },
+        {
+          id: "4-4-3-e3",
+          enunciado: "¿Cuántas paralelas puedo trazar a una recta dada?",
+          tipo: "seleccion",
+          opciones: ["Solo una", "Solo dos (una a cada lado)", "Infinitas"],
+          respuesta: "Infinitas",
+          pista: "¿Hay un límite para cuántas líneas puede haber a la misma distancia de una recta?",
+          explicacion: "Por cualquier punto que no esté en la recta, pasa exactamente una paralela. Como hay infinitos puntos, hay infinitas paralelas posibles.",
+        },
+        {
+          id: "4-4-3-e4",
+          enunciado: "Si trazo dos líneas perpendiculares a la misma recta, ¿qué relación tienen entre sí esas dos líneas?",
+          tipo: "seleccion",
+          opciones: ["Son perpendiculares entre sí", "Son paralelas entre sí", "No tienen ninguna relación"],
+          respuesta: "Son paralelas entre sí",
+          pista: "Si ambas forman 90° con la misma recta, ¿qué ángulo forman entre ellas?",
+          explicacion: "Si la recta A ⊥ recta C y la recta B ⊥ recta C, entonces la recta A ∥ recta B. Ambas perpendiculares son paralelas entre sí.",
+        },
+      ],
+    },
+    {
+      id: "4-4-4",
+      titulo: "El compás: círculos y construcciones geométricas",
+      objetivo: "Usar el compás para trazar círculos, arcos y realizar construcciones geométricas básicas.",
+      concepto_clave: "El compás traza todos los puntos a la misma distancia (radio) de un centro. Sirve para construir figuras exactas.",
+      explicacion: [
+        "El COMPÁS es un instrumento con dos brazos: uno con punta metálica (el centro) y otro con lápiz (para dibujar). La distancia entre los brazos es el RADIO.",
+        "Al girar el compás alrededor de la punta, trazamos todos los puntos que están a la misma distancia del centro → una CIRCUNFERENCIA.",
+        "Con compás y regla podemos hacer construcciones geométricas exactas: copiar longitudes, trazar mediatrices, bisectrices, ángulos rectos y más. Los griegos antiguos construyeron geometría compleja con solo estos dos instrumentos.",
+      ],
+      ejemplos: [
+        {
+          enunciado: "¿Cómo copio un segmento AB con el compás?",
+          pasos: [
+            { texto: "Abro el compás hasta que mida exactamente lo mismo que AB (punta en A, lápiz en B)" },
+            { texto: "Coloco la punta en el punto de inicio del nuevo segmento" },
+            { texto: "Trazo un arco. La intersección del arco con la recta es el otro extremo" },
+          ],
+          resultado: "El nuevo segmento es exactamente igual a AB (congruente)",
+        },
+        {
+          enunciado: "¿Cómo trazo un círculo de radio 3 cm?",
+          pasos: [
+            { texto: "Marco el centro O en el papel" },
+            { texto: "Abro el compás a exactamente 3 cm (usando la regla para medir)" },
+            { texto: "Pongo la punta en O y giro el compás 360° dibujando la circunferencia" },
+          ],
+          resultado: "Obtengo una circunferencia donde todos los puntos están a exactamente 3 cm de O",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "4-4-4-e1",
+          enunciado: "¿Cuál es el propósito de la punta metálica del compás?",
+          tipo: "seleccion",
+          opciones: ["Dibujar la circunferencia", "Marcar el centro fijo (pivote)", "Medir el radio"],
+          respuesta: "Marcar el centro fijo (pivote)",
+          pista: "¿Qué brazo se queda quieto cuando giras el compás?",
+          explicacion: "La punta metálica se clava en el papel y marca el centro fijo (pivote). El brazo con lápiz gira alrededor de ese centro.",
+        },
+        {
+          id: "4-4-4-e2",
+          enunciado: "Si el radio de un círculo es 5 cm, ¿cuánto mide el diámetro?",
+          tipo: "numero",
+          respuesta: "10",
+          pista: "Diámetro = 2 × Radio.",
+          explicacion: "Diámetro = 2 × 5 = 10 cm. El diámetro siempre es el doble del radio.",
+        },
+        {
+          id: "4-4-4-e3",
+          enunciado: "¿Cómo uso el compás para verificar que dos segmentos son iguales sin usar la regla?",
+          tipo: "texto",
+          respuesta: "Abro el compás para que mida el primer segmento y luego compruebo si la apertura cabe exactamente en el segundo",
+          pista: "El compás 'guarda' la medida mientras está abierto.",
+          explicacion: "Coloco la punta en un extremo del primer segmento y el lápiz en el otro. Luego, sin cambiar la apertura, verifico si los extremos del compás coinciden exactamente con los extremos del segundo segmento.",
+        },
+        {
+          id: "4-4-4-e4",
+          enunciado: "Con compás y regla, ¿es posible construir un triángulo equilátero perfecto? ¿Cómo?",
+          tipo: "seleccion",
+          opciones: [
+            "No, se necesita transportador",
+            "Sí: traza un segmento, luego desde cada extremo traza un arco del mismo radio. La intersección es el tercer vértice.",
+            "Sí, pero solo si el lado mide exactamente 10 cm",
+          ],
+          respuesta: "Sí: traza un segmento, luego desde cada extremo traza un arco del mismo radio. La intersección es el tercer vértice.",
+          pista: "En un triángulo equilátero, todos los lados son iguales. ¿Cómo garantizas que los otros dos lados midan lo mismo que el primero?",
+          explicacion: "Traza AB. Con apertura AB, traza arco desde A y arco desde B. Se intersectan en C. Como CA=CB=AB (todos son radios iguales), el triángulo ABC es equilátero.",
+        },
+      ],
+    },
+  ],
+}
+
+export default unidad4

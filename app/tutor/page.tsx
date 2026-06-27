@@ -28,8 +28,8 @@ function TutorContent() {
   const [cargando, setCargando] = useState(false);
   const [muro, setMuro] = useState(false);
   const [ejercicios, setEjercicios] = useState<Ejercicio[]>([]);
-  // Contador local de preguntas gratis (se resetea al recargar — la BD es la fuente de verdad para el plan)
-  const preguntasRef = useRef(0);
+  // Conteo real de preguntas usadas, cargado desde la BD al montar
+  const [usoReal, setUsoReal] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
 
@@ -42,6 +42,13 @@ function TutorContent() {
         if (!d || !d.onboarding_completado) { router.push("/configurar"); return; }
         setPerfil(d);
         setGrado(d.grado as Grado);
+        // Cargar uso real desde la BD (para evitar reset al recargar)
+        if (d.plan !== "mensual" && d.plan !== "anual") {
+          fetch("/api/uso").then((r) => r.json()).then((u) => {
+            setUsoReal(u.uso ?? 0);
+            if ((u.uso ?? 0) >= 5) setMuro(true);
+          });
+        }
         // Si viene desde /clases con ?tema=, lo pre-carga
         const temaParam = searchParams.get("tema");
         const contextoParam = searchParams.get("contexto");
@@ -64,11 +71,11 @@ function TutorContent() {
   function esPro() { return perfil?.plan === "mensual" || perfil?.plan === "anual"; }
 
   function puedePreguntar() {
-    return esPro() || preguntasRef.current < LIMITE_GRATIS;
+    return esPro() || usoReal < LIMITE_GRATIS;
   }
 
   function quedanGratis() {
-    return Math.max(0, LIMITE_GRATIS - preguntasRef.current);
+    return Math.max(0, LIMITE_GRATIS - usoReal);
   }
 
   function elegirTema(id: string, nombre: string) {
@@ -98,7 +105,7 @@ function TutorContent() {
     setTexto("");
     const foto = img; setImg(null);
     setCargando(true);
-    preguntasRef.current += 1;
+    setUsoReal((u) => u + 1);
 
     // Registrar pregunta en BD (fire and forget)
     fetch("/api/progreso", {
@@ -118,6 +125,11 @@ function TutorContent() {
         }),
       });
       const data = await resp.json();
+      if (resp.status === 403 && data.error === "limite_alcanzado") {
+        setMuro(true);
+        setUsoReal(data.uso ?? LIMITE_GRATIS);
+        return;
+      }
       const msgs: Msg[] = [];
       if (data.ejercicioExtraido) {
         msgs.push({ role: "assistant", content: `📋 Ejercicio detectado:\n${data.ejercicioExtraido}` });
@@ -159,12 +171,35 @@ function TutorContent() {
       <main className="contenedor">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Link href="/" className="nota">← Inicio</Link>
-          <div style={{ display: "flex", gap: 12 }}>
-            <Link href="/clases" className="nota">📚 Clases</Link>
-            <Link href="/padres" className="nota">Ver avance →</Link>
-          </div>
+          <Link href="/padres" className="nota">Ver avance →</Link>
         </div>
-        <h1 style={{ fontSize: 28, margin: "12px 0 18px" }}>
+
+        {/* Acceso a Clases — prominente */}
+        <Link href="/clases" style={{ textDecoration: "none", display: "block", margin: "16px 0" }}>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 14,
+            background: "#e8f4fd", border: "2px solid #2980b9",
+            borderRadius: "var(--radio)", padding: "14px 18px",
+            boxShadow: "4px 4px 0 #2980b9",
+            transition: "transform 0.08s, box-shadow 0.08s",
+          }}
+            onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.transform = "translate(2px,2px)"; el.style.boxShadow = "2px 2px 0 #2980b9"; }}
+            onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.transform = ""; el.style.boxShadow = "4px 4px 0 #2980b9"; }}
+          >
+            <span style={{ fontSize: 28 }}>📚</span>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontFamily: "var(--display)", fontWeight: 700, fontSize: 16, color: "#1a5276", margin: 0 }}>
+                Ver clases del currículo
+              </p>
+              <p style={{ fontSize: 13, color: "#2980b9", margin: 0 }}>
+                Lecciones organizadas por unidad · Grado {perfil.grado}
+              </p>
+            </div>
+            <span style={{ fontSize: 20, color: "#2980b9" }}>→</span>
+          </div>
+        </Link>
+
+        <h1 style={{ fontSize: 24, margin: "8px 0 14px" }}>
           {perfil.nombre_hijo}, ¿con qué <span className="marca">tema</span> necesitas ayuda?
         </h1>
         <div className="fila">

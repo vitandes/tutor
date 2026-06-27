@@ -1,0 +1,282 @@
+import type { Unidad } from "../tipos"
+
+const unidad1: Unidad = {
+  id: 1,
+  nombre: "El Sistema Decimal de Numeración",
+  descripcion: "Explora la estructura de los números grandes y los sistemas de numeración en diferentes bases.",
+  color: "blue",
+  icono: "🔢",
+  lecciones: [
+    {
+      id: "4-1-1",
+      titulo: "Valor de posición y secuencias numéricas",
+      objetivo: "Identificar el valor posicional de cada dígito en números grandes y completar secuencias numéricas.",
+      concepto_clave: "En el Sistema Decimal, cada posición vale 10 veces más que la posición a su derecha.",
+      explicacion: [
+        "El Sistema Decimal de Numeración (SDN) es el sistema que usamos todos los días. Se llama 'decimal' porque se agrupa de 10 en 10: 10 unidades forman 1 decena, 10 decenas forman 1 centena, 10 centenas forman 1 unidad de mil, y así sucesivamente.",
+        "Cada dígito en un número tiene un VALOR POSICIONAL: el mismo dígito vale diferente según dónde esté. En 333, el primer 3 vale 300, el segundo vale 30 y el tercero vale 3.",
+        "Las SECUENCIAS NUMÉRICAS son listas de números que siguen un patrón de aumento o disminución constante. Reconocer el patrón nos permite predecir los números que siguen.",
+      ],
+      ejemplos: [
+        {
+          enunciado: "¿Cuánto vale el dígito 7 en cada número: 7.000.000 / 700.000 / 70.000 / 7.000?",
+          pasos: [
+            { texto: "7.000.000 → 7 está en millones → vale 7.000.000" },
+            { texto: "700.000 → 7 está en centenas de mil → vale 700.000" },
+            { texto: "70.000 → 7 está en decenas de mil → vale 70.000" },
+            { texto: "7.000 → 7 está en unidades de mil → vale 7.000" },
+          ],
+          resultado: "El mismo dígito 7 puede valer desde 7.000 hasta 7.000.000 según su posición",
+        },
+        {
+          enunciado: "Completa la secuencia: 125.000 / 150.000 / 175.000 / ___ / ___",
+          pasos: [
+            { texto: "150.000 − 125.000 = 25.000 → patrón: +25.000" },
+            { texto: "175.000 + 25.000 = 200.000" },
+            { texto: "200.000 + 25.000 = 225.000" },
+          ],
+          resultado: "La secuencia continúa: 200.000 / 225.000",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "4-1-1-e1",
+          enunciado: "¿Cuánto vale el dígito 5 en el número 5.320.000?",
+          tipo: "seleccion",
+          opciones: ["500.000", "5.000.000", "50.000", "500"],
+          respuesta: "5.000.000",
+          pista: "El 5 es el primer dígito del número. ¿Qué posición tiene el primer dígito en un número de 7 cifras?",
+          explicacion: "El 5 está en la posición de los millones. 5 × 1.000.000 = 5.000.000.",
+        },
+        {
+          id: "4-1-1-e2",
+          enunciado: "Continúa la secuencia: 10.000 / 20.000 / 40.000 / 80.000 / ___",
+          tipo: "numero",
+          respuesta: "160000",
+          pista: "Observa: ¿sumas o multiplicas para pasar de un término al siguiente?",
+          explicacion: "El patrón es ×2 (se duplica). 80.000 × 2 = 160.000.",
+        },
+        {
+          id: "4-1-1-e3",
+          enunciado: "Escribe el número: cuatro millones trescientos veinte mil quinientos",
+          tipo: "numero",
+          respuesta: "4320500",
+          pista: "Cuatro millones = 4.000.000. Trescientos veinte mil = 320.000. Quinientos = 500.",
+          explicacion: "4.000.000 + 320.000 + 500 = 4.320.500",
+        },
+        {
+          id: "4-1-1-e4",
+          enunciado: "¿Qué número es 100.000 más que 3.450.000?",
+          tipo: "numero",
+          respuesta: "3550000",
+          pista: "Suma 100.000 al número dado.",
+          explicacion: "3.450.000 + 100.000 = 3.550.000",
+        },
+      ],
+    },
+    {
+      id: "4-1-2",
+      titulo: "Empaques en Base 2 y otras bases",
+      objetivo: "Comprender que se pueden formar grupos de cualquier tamaño, no solo de 10, para representar cantidades.",
+      concepto_clave: "En Base 2 se forman grupos de 2. En Base 5, grupos de 5. En Base 10 (decimal), grupos de 10.",
+      explicacion: [
+        "Nuestro sistema decimal usa base 10 porque agrupamos de 10 en 10. Pero podemos imaginar otros sistemas donde el grupo sea diferente.",
+        "En BASE 2 (binario): agrupamos de 2 en 2. Con 8 tarjetas: 8 = 4 grupos de 2 = 2 grupos de (2 grupos de 2) = 1 grupo de (2 grupos de (2 grupos de 2)). Así 8 en base 2 se escribe 1000.",
+        "¿Por qué importa? Las computadoras usan base 2 (solo tienen 0 y 1). Entender otras bases nos ayuda a comprender MEJOR por qué el sistema decimal funciona como funciona.",
+      ],
+      ejemplos: [
+        {
+          enunciado: "Convierte 6 objetos a Base 2 (empaqueta de 2 en 2)",
+          pasos: [
+            { texto: "6 objetos → ¿cuántos pares de 2? → 3 pares, sobran 0" },
+            { texto: "3 pares → ¿cuántos pares de pares? → 1 par de pares, sobra 1 par" },
+            { texto: "Resultado: 1 grupo de 4, 1 grupo de 2, 0 unidades" },
+          ],
+          resultado: "6 en base 10 = 110 en base 2 (un cuatro, un dos, cero unidades)",
+        },
+        {
+          enunciado: "¿Cuánto es 1101 en base 2, convertido a base 10?",
+          pasos: [
+            { texto: "1 × 8 = 8 (posición de los 'ochos')" },
+            { texto: "1 × 4 = 4 (posición de los 'cuatros')" },
+            { texto: "0 × 2 = 0 (posición de los 'doses')" },
+            { texto: "1 × 1 = 1 (posición de las unidades)" },
+            { texto: "Total: 8 + 4 + 0 + 1 = 13" },
+          ],
+          resultado: "1101 en base 2 = 13 en base 10",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "4-1-2-e1",
+          enunciado: "¿Cuántos grupos de 2 formo con 10 objetos? ¿Cuántos grupos de grupos de 2?",
+          tipo: "texto",
+          respuesta: "5 grupos de 2, y luego 2 grupos de grupos más 1 grupo sobrante",
+          pista: "10 ÷ 2 = 5 grupos. Luego 5 grupos ÷ 2 = 2 grupos con 1 sobrante.",
+          explicacion: "10 = 5 pares = 2 pares-de-pares + 1 par. En base 2: 1010 (un 8, cero 4, un 2, cero unidades). 8+2=10 ✓",
+        },
+        {
+          id: "4-1-2-e2",
+          enunciado: "En Base 5, ¿cuántos grupos de 5 hay en 25 objetos?",
+          tipo: "numero",
+          respuesta: "5",
+          pista: "25 ÷ 5 = ?",
+          explicacion: "25 ÷ 5 = 5 grupos. Y 5 grupos-de-5 forman 1 grupo de 25. En base 5: 25 se escribe como 100 (un grupo de 25, cero cincos, cero unidades).",
+        },
+        {
+          id: "4-1-2-e3",
+          enunciado: "¿Qué base usan las computadoras y por qué?",
+          tipo: "seleccion",
+          opciones: ["Base 10, porque es la más fácil", "Base 2, porque los circuitos solo tienen dos estados: encendido y apagado", "Base 8, porque tienen 8 bits"],
+          respuesta: "Base 2, porque los circuitos solo tienen dos estados: encendido y apagado",
+          pista: "Piensa en un interruptor de luz: ¿cuántos estados tiene?",
+          explicacion: "Las computadoras usan base 2 (binario) porque sus circuitos eléctricos solo tienen dos estados: corriente (1) o sin corriente (0).",
+        },
+        {
+          id: "4-1-2-e4",
+          enunciado: "En base 10, agrupamos de 10 en 10. ¿Cuántos dígitos distintos usamos (del 0 al...)?",
+          tipo: "numero",
+          respuesta: "10",
+          pista: "Contamos: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9. ¿Cuántos son?",
+          explicacion: "En base 10 usamos 10 dígitos distintos: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9. En base 2 solo se usan 2 dígitos: 0 y 1.",
+        },
+      ],
+    },
+    {
+      id: "4-1-3",
+      titulo: "Números más allá del millón",
+      objetivo: "Leer, escribir y representar números hasta los miles de millones.",
+      concepto_clave: "Después del millón: decenas de millón (10.000.000), centenas de millón (100.000.000), mil millones (1.000.000.000).",
+      explicacion: [
+        "Ya conocemos el millón (1.000.000). En cuarto grado vamos más allá: 10 millones, 100 millones, 1.000 millones (mil millones).",
+        "Para leer números muy grandes, los separamos en grupos de 3 cifras de derecha a izquierda. El grupo más a la derecha son las unidades (unidades, decenas, centenas), el siguiente son los miles, y el siguiente son los millones.",
+        "Colombia tiene alrededor de 52.000.000 de habitantes. El PIB de Colombia es de unos 300.000.000.000 de pesos (trescientos mil millones). ¡Los números grandes están en todas partes!",
+      ],
+      ejemplos: [
+        {
+          enunciado: "¿Cómo se lee 45.320.700?",
+          pasos: [
+            { texto: "Separamos en grupos: 45 | 320 | 700" },
+            { texto: "45 millones: cuarenta y cinco millones" },
+            { texto: "320 miles: trescientos veinte mil" },
+            { texto: "700 unidades: setecientos" },
+          ],
+          resultado: "Cuarenta y cinco millones trescientos veinte mil setecientos",
+        },
+        {
+          enunciado: "Escribe en cifras: doscientos tres millones cuarenta y cinco mil",
+          pasos: [
+            { texto: "Doscientos tres millones = 203.000.000" },
+            { texto: "Cuarenta y cinco mil = 45.000" },
+            { texto: "No hay unidades sueltas → 203.000.000 + 45.000" },
+          ],
+          resultado: "203.045.000",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "4-1-3-e1",
+          enunciado: "¿Cuántos ceros tiene 1 mil millones (1.000.000.000)?",
+          tipo: "numero",
+          respuesta: "9",
+          pista: "Cuenta los grupos de tres ceros: miles → millones → mil millones.",
+          explicacion: "1.000.000.000 tiene 9 ceros. Es 10 veces más grande que 100.000.000.",
+        },
+        {
+          id: "4-1-3-e2",
+          enunciado: "Lee este número: 7.500.000",
+          tipo: "texto",
+          respuesta: "siete millones quinientos mil",
+          pista: "Separa: 7 millones | 500 miles | 000 unidades.",
+          explicacion: "7.500.000 = 7 millones + 500 mil = siete millones quinientos mil.",
+        },
+        {
+          id: "4-1-3-e3",
+          enunciado: "¿Cuál número es mayor: 98.000.000 o 100.000.000?",
+          tipo: "seleccion",
+          opciones: ["98.000.000", "100.000.000", "Son iguales"],
+          respuesta: "100.000.000",
+          pista: "100 millones tiene 9 cifras; 98 millones tiene 8 cifras.",
+          explicacion: "100.000.000 tiene 9 cifras y 98.000.000 tiene 8 cifras. Con más cifras, el número es mayor.",
+        },
+        {
+          id: "4-1-3-e4",
+          enunciado: "Escribe en cifras: cincuenta millones doscientos mil",
+          tipo: "numero",
+          respuesta: "50200000",
+          pista: "Cincuenta millones = 50.000.000. Doscientos mil = 200.000.",
+          explicacion: "50.000.000 + 200.000 = 50.200.000",
+        },
+      ],
+    },
+    {
+      id: "4-1-4",
+      titulo: "Comparación y orden de números grandes",
+      objetivo: "Comparar, ordenar y ubicar en la recta numérica números hasta los millones.",
+      concepto_clave: "Para comparar números grandes: primero la cantidad de cifras, luego cifra por cifra de izquierda a derecha.",
+      explicacion: [
+        "Comparar números grandes sigue las mismas reglas que números pequeños: empezamos por la posición de mayor valor.",
+        "Si dos números tienen distinta cantidad de cifras, el que tiene más cifras es mayor. Si tienen la misma cantidad, comparamos de izquierda a derecha hasta encontrar una diferencia.",
+        "En la recta numérica, los números crecen hacia la derecha. Podemos ubicar millones igual que hacemos con centenas o miles.",
+      ],
+      ejemplos: [
+        {
+          enunciado: "Ordena de menor a mayor: 4.500.000 / 4.050.000 / 4.005.000",
+          pasos: [
+            { texto: "Los tres tienen 7 cifras y empiezan en 4 millones" },
+            { texto: "Comparamos centenas de mil: 5 vs 0 vs 0 → los dos últimos empatan en 0" },
+            { texto: "Comparamos decenas de mil: 0 vs 5 vs 0 → 4.050.000 tiene 5 aquí" },
+            { texto: "Comparamos unidades de mil: 0 vs 0 vs 5 → 4.005.000 tiene 5 aquí" },
+          ],
+          resultado: "4.005.000 < 4.050.000 < 4.500.000",
+        },
+        {
+          enunciado: "¿Verdadero o falso? 9.999.999 > 10.000.000",
+          pasos: [
+            { texto: "9.999.999 tiene 7 cifras" },
+            { texto: "10.000.000 tiene 8 cifras" },
+            { texto: "El de más cifras es mayor" },
+          ],
+          resultado: "FALSO. 9.999.999 < 10.000.000",
+        },
+      ],
+      ejercicios: [
+        {
+          id: "4-1-4-e1",
+          enunciado: "Coloca el signo correcto: 7.300.000 ___ 7.030.000",
+          tipo: "seleccion",
+          opciones: [">", "<", "="],
+          respuesta: ">",
+          pista: "Compara cifra por cifra: ambos tienen 7 millones. Compara centenas de mil: 3 vs 0.",
+          explicacion: "Ambos tienen 7 millones. En centenas de mil: 3 > 0. Entonces 7.300.000 > 7.030.000.",
+        },
+        {
+          id: "4-1-4-e2",
+          enunciado: "¿Cuál es el mayor número de 7 cifras posible?",
+          tipo: "numero",
+          respuesta: "9999999",
+          pista: "El mayor dígito es 9. Un número de 7 cifras va de 1.000.000 a 9.999.999.",
+          explicacion: "El mayor número de 7 cifras es 9.999.999 (nueve millones novecientos noventa y nueve mil novecientos noventa y nueve).",
+        },
+        {
+          id: "4-1-4-e3",
+          enunciado: "Ordena de mayor a menor: 2.100.000 / 2.010.000 / 2.001.000",
+          tipo: "texto",
+          respuesta: "2100000,2010000,2001000",
+          pista: "Todos tienen 2 millones. Compara centenas de mil.",
+          explicacion: "2.100.000 > 2.010.000 > 2.001.000",
+        },
+        {
+          id: "4-1-4-e4",
+          enunciado: "¿Entre qué dos millones exactos está el número 3.750.000?",
+          tipo: "texto",
+          respuesta: "3000000 y 4000000",
+          pista: "¿Cuántos millones completos tiene? ¿Cuál es el millón siguiente?",
+          explicacion: "3.750.000 está entre 3.000.000 (tres millones) y 4.000.000 (cuatro millones).",
+        },
+      ],
+    },
+  ],
+}
+
+export default unidad1

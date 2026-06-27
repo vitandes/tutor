@@ -1,9 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import { use } from "react"
+import { use, useState, useEffect } from "react"
 import { getUnidad } from "@/lib/clases"
 import { notFound } from "next/navigation"
+
+const LECCIONES_GRATIS = 1
 
 const COLORES = [
   { fondo: "#e8f4fd", borde: "#2980b9", texto: "#1a5276", header: "#2980b9" },
@@ -14,12 +16,18 @@ const COLORES = [
   { fondo: "#fdedec", borde: "#e74c3c", texto: "#922b21", header: "#e74c3c" },
 ]
 
-export default function UnidadPage({ params }: { params: Promise<{ unidadId: string }> }) {
-  const { unidadId } = use(params)
-  const unidad = getUnidad(3, Number(unidadId))
+export default function UnidadPage({ params }: { params: Promise<{ grado: string; unidadId: string }> }) {
+  const { grado, unidadId } = use(params)
+  const unidad = getUnidad(Number(grado), Number(unidadId))
   if (!unidad) notFound()
 
+  const [plan, setPlan] = useState<string | null>(null)
+  useEffect(() => {
+    fetch("/api/perfil").then((r) => r.json()).then((d) => setPlan(d?.plan ?? "free"))
+  }, [])
+
   const col = COLORES[(unidad.id - 1) % COLORES.length]
+  const esPro = plan === "mensual" || plan === "anual"
 
   return (
     <main className="contenedor">
@@ -61,69 +69,64 @@ export default function UnidadPage({ params }: { params: Promise<{ unidadId: str
         </div>
       </div>
 
+      {/* Aviso free si aplica */}
+      {plan !== null && !esPro && (
+        <div style={{ marginBottom: 16, padding: "10px 14px", background: "var(--marcador)", border: "2px solid var(--tinta)", borderRadius: "var(--radio)", fontSize: 13 }}>
+          Plan gratuito · Solo la primera lección de cada unidad está disponible.{" "}
+          <Link href="/api/checkout?plan=mensual" style={{ color: "var(--coral)", fontWeight: 700 }}>Activar plan →</Link>
+        </div>
+      )}
+
       {/* Lista de lecciones */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {unidad.lecciones.map((leccion, idx) => (
+        {unidad.lecciones.map((leccion, idx) => {
+          const bloqueada = plan !== null && !esPro && idx >= LECCIONES_GRATIS
+          return (
           <Link
             key={leccion.id}
-            href={`/clases/${unidad.id}/${leccion.id}`}
+            href={`/clases/${grado}/${unidadId}/${leccion.id}`}
             style={{
               display: "flex",
               alignItems: "center",
               gap: 14,
-              background: "#fff",
-              border: "2px solid var(--tinta)",
+              background: bloqueada ? "#f5f5f5" : "#fff",
+              border: `2px solid ${bloqueada ? "var(--linea)" : "var(--tinta)"}`,
               borderRadius: "var(--radio)",
               padding: "14px 18px",
-              boxShadow: "3px 3px 0 var(--tinta)",
+              boxShadow: bloqueada ? "none" : "3px 3px 0 var(--tinta)",
               textDecoration: "none",
-              color: "var(--tinta)",
+              color: bloqueada ? "var(--gris)" : "var(--tinta)",
               transition: "transform 0.08s, box-shadow 0.08s",
+              opacity: bloqueada ? 0.7 : 1,
             }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = "translate(2px,2px)"
-              ;(e.currentTarget as HTMLElement).style.boxShadow = "1px 1px 0 var(--tinta)"
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = ""
-              ;(e.currentTarget as HTMLElement).style.boxShadow = "3px 3px 0 var(--tinta)"
-            }}
+            onMouseEnter={(e) => { if (!bloqueada) { (e.currentTarget as HTMLElement).style.transform = "translate(2px,2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "1px 1px 0 var(--tinta)" } }}
+            onMouseLeave={(e) => { if (!bloqueada) { (e.currentTarget as HTMLElement).style.transform = ""; (e.currentTarget as HTMLElement).style.boxShadow = "3px 3px 0 var(--tinta)" } }}
           >
-            {/* Número */}
             <div style={{
-              width: 36,
-              height: 36,
-              borderRadius: "50%",
-              background: col.header,
+              width: 36, height: 36, borderRadius: "50%",
+              background: bloqueada ? "var(--linea)" : col.header,
               color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "var(--display)",
-              fontWeight: 700,
-              fontSize: 15,
-              flexShrink: 0,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontFamily: "var(--display)", fontWeight: 700, fontSize: 15, flexShrink: 0,
             }}>
-              {idx + 1}
+              {bloqueada ? "🔒" : idx + 1}
             </div>
-
-            {/* Texto */}
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontFamily: "var(--display)", fontWeight: 600, fontSize: 15, lineHeight: 1.3 }}>
                 {leccion.titulo}
               </p>
               <p style={{ fontSize: 12, color: "var(--gris)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {leccion.objetivo}
+                {bloqueada ? "Requiere plan activo" : leccion.objetivo}
               </p>
             </div>
-
-            {/* Meta */}
             <div style={{ flexShrink: 0, textAlign: "right", fontSize: 12, color: "var(--gris)" }}>
-              <div>{leccion.ejercicios.length} ejercicios</div>
-              <div style={{ fontSize: 18, color: col.borde, marginTop: 2 }}>›</div>
+              {!bloqueada && <div>{leccion.ejercicios.length} ejercicios</div>}
+              <div style={{ fontSize: 18, color: bloqueada ? "var(--gris)" : col.borde, marginTop: 2 }}>
+                {bloqueada ? "🔒" : "›"}
+              </div>
             </div>
           </Link>
-        ))}
+        )})}
       </div>
 
       <div style={{ marginTop: 24 }}>
