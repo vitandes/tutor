@@ -76,13 +76,21 @@ export async function GET(req: Request) {
           }
         } 
         else if (mlSubscription.status === 'cancelled' || mlSubscription.status === 'paused') {
-          // Si fue cancelada o está en mora, actualizamos el estado en base de datos
+          // Si fue cancelada o está en mora, revocar acceso y actualizar estado
           const newStatus = mlSubscription.status === 'cancelled' ? 'canceled' : 'paused';
-          
+
           await supabaseAdmin
             .from('subscriptions')
             .update({ status: newStatus })
             .eq('id', sub.id);
+
+          if (sub.user_id) {
+            await supabaseAdmin
+              .from('profiles')
+              .update({ plan: 'free' })
+              .eq('id', sub.user_id);
+            console.log(`[CRON Sync] ❌ profiles.plan → free for user ${sub.user_id} (${newStatus})`);
+          }
           console.log(`[CRON Sync] ❌ Updated subscription ${sub.id} to ${newStatus}`);
         }
         

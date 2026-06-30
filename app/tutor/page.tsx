@@ -11,8 +11,6 @@ interface Msg { role: "user" | "assistant"; content: string; img?: string; reint
 interface Ejercicio { enunciado: string; pista: string; }
 interface Perfil { nombre_hijo: string; grado: string; plan: string; onboarding_completado: boolean; }
 
-const LIMITE_GRATIS = 5;
-
 function TutorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -26,12 +24,9 @@ function TutorContent() {
   const [texto, setTexto] = useState("");
   const [img, setImg] = useState<{ data: string; tipo: string; preview: string } | null>(null);
   const [cargando, setCargando] = useState(false);
-  const [muro, setMuro] = useState(false);
-  const [ejercicios, setEjercicios] = useState<Ejercicio[]>([]);
-  // Conteo real de preguntas usadas, cargado desde la BD al montar
-  const [usoReal, setUsoReal] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
+  const [ejercicios, setEjercicios] = useState<Ejercicio[]>([]);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -42,14 +37,6 @@ function TutorContent() {
         if (!d || !d.onboarding_completado) { router.push("/configurar"); return; }
         setPerfil(d);
         setGrado(d.grado as Grado);
-        // Cargar uso real desde la BD (para evitar reset al recargar)
-        if (d.plan !== "mensual" && d.plan !== "anual") {
-          fetch("/api/uso").then((r) => r.json()).then((u) => {
-            setUsoReal(u.uso ?? 0);
-            if ((u.uso ?? 0) >= 5) setMuro(true);
-          });
-        }
-        // Si viene desde /clases con ?tema=, lo pre-carga
         const temaParam = searchParams.get("tema");
         const contextoParam = searchParams.get("contexto");
         if (temaParam) {
@@ -63,20 +50,11 @@ function TutorContent() {
       });
   }, [isLoaded, isSignedIn, router]);
 
-  // Scroll al último mensaje
   useEffect(() => {
     if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
   }, [mensajes]);
 
   function esPro() { return perfil?.plan === "mensual" || perfil?.plan === "anual"; }
-
-  function puedePreguntar() {
-    return esPro() || usoReal < LIMITE_GRATIS;
-  }
-
-  function quedanGratis() {
-    return Math.max(0, LIMITE_GRATIS - usoReal);
-  }
 
   function elegirTema(id: string, nombre: string) {
     setTemaId(id);
@@ -98,16 +76,13 @@ function TutorContent() {
 
   async function enviar() {
     if (!texto.trim() && !img) return;
-    if (!puedePreguntar()) { setMuro(true); return; }
     const nuevo: Msg = { role: "user", content: texto.trim(), img: img?.preview };
     const historia = [...mensajes, nuevo];
     setMensajes(historia);
     setTexto("");
     const foto = img; setImg(null);
     setCargando(true);
-    setUsoReal((u) => u + 1);
 
-    // Registrar pregunta en BD (fire and forget)
     fetch("/api/progreso", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -125,11 +100,6 @@ function TutorContent() {
         }),
       });
       const data = await resp.json();
-      if (resp.status === 403 && data.error === "limite_alcanzado") {
-        setMuro(true);
-        setUsoReal(data.uso ?? LIMITE_GRATIS);
-        return;
-      }
       const msgs: Msg[] = [];
       if (data.ejercicioExtraido) {
         msgs.push({ role: "assistant", content: `📋 Ejercicio detectado:\n${data.ejercicioExtraido}` });
@@ -143,7 +113,6 @@ function TutorContent() {
   }
 
   function logre() {
-    // Registrar logro en BD (fire and forget)
     fetch("/api/progreso", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -165,6 +134,30 @@ function TutorContent() {
   }
 
   if (!perfil || !grado) return <main className="contenedor"><p className="nota">Cargando…</p></main>;
+
+  // Paywall si no tiene plan activo
+  if (!esPro()) {
+    return (
+      <main className="contenedor">
+        <Link href="/" className="nota">← Inicio</Link>
+        <div className="tarjeta" style={{ textAlign: "center", padding: "48px 24px", marginTop: 24 }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
+          <h2 style={{ fontSize: 24, marginBottom: 8 }}>Activa tu plan para empezar</h2>
+          <p className="nota" style={{ marginBottom: 24, maxWidth: 380, margin: "0 auto 24px" }}>
+            El tutor, las clases y el seguimiento de progreso están disponibles con cualquier plan.
+            Incluye días de prueba gratis — sin cobro hasta que termine el período.
+          </p>
+          <Link href="/api/checkout?plan=mensual" className="btn coral" style={{ display: "inline-block", marginBottom: 10 }}>
+            Activar plan mensual · $39.900/mes →
+          </Link>
+          <br />
+          <Link href="/api/checkout?plan=anual" className="btn fantasma" style={{ display: "inline-block", marginTop: 8 }}>
+            Plan anual · $199.999/año (ahorra 58%)
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   if (!temaId) {
     return (
@@ -207,12 +200,6 @@ function TutorContent() {
             <button key={t.id} className="chip" onClick={() => elegirTema(t.id, t.nombre)}>{t.nombre}</button>
           ))}
         </div>
-        {!esPro() && (
-          <p className="nota" style={{ marginTop: 20 }}>
-            Plan gratuito · {quedanGratis()} preguntas restantes ·{" "}
-            <Link href="/#planes" style={{ color: "var(--coral)" }}>Ver planes</Link>
-          </p>
-        )}
       </main>
     );
   }
@@ -223,7 +210,7 @@ function TutorContent() {
         <button className="nota" onClick={() => setTemaId(null)} style={{ background: "none", border: "none", cursor: "pointer" }}>
           ← {temaNombre}
         </button>
-        <span className="racha">{esPro() ? "★ Plan activo" : `${quedanGratis()} gratis`}</span>
+        <span className="racha">★ Plan activo</span>
       </div>
 
       <div className="chat" ref={chatRef}>
@@ -258,39 +245,25 @@ function TutorContent() {
         </div>
       )}
 
-      {muro ? (
-        <div className="tarjeta muro">
-          <h3 style={{ fontSize: 22, marginBottom: 8 }}>Se acabaron las preguntas gratis</h3>
-          <p className="nota" style={{ marginBottom: 16 }}>Activa el plan para preguntas ilimitadas y el reporte de avance.</p>
-          <Link href="/api/checkout?plan=mensual">
-            <span className="btn coral">Activar plan mensual · $39.900/mes →</span>
-          </Link>
-          <br />
-          <Link href="/api/checkout?plan=anual">
-            <span className="btn fantasma" style={{ marginTop: 10, display: "inline-block" }}>Plan anual · $199.999/año (ahorra 58%)</span>
-          </Link>
+      <>
+        {img && <img src={img.preview} className="thumb" alt="vista previa" />}
+        <div className="entrada">
+          <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={leerFoto} />
+          <button className="iconbtn" onClick={() => fileRef.current?.click()} title="Foto de la tarea">📷</button>
+          <textarea
+            rows={1}
+            placeholder="Escribe lo que intentaste…"
+            value={texto}
+            onChange={(e) => setTexto(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }}
+          />
+          <button className="btn coral" onClick={enviar} disabled={cargando}>Enviar</button>
         </div>
-      ) : (
-        <>
-          {img && <img src={img.preview} className="thumb" alt="vista previa" />}
-          <div className="entrada">
-            <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={leerFoto} />
-            <button className="iconbtn" onClick={() => fileRef.current?.click()} title="Foto de la tarea">📷</button>
-            <textarea
-              rows={1}
-              placeholder="Escribe lo que intentaste…"
-              value={texto}
-              onChange={(e) => setTexto(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }}
-            />
-            <button className="btn coral" onClick={enviar} disabled={cargando}>Enviar</button>
-          </div>
-          <div className="fila" style={{ marginTop: 12 }}>
-            <button className="btn" onClick={logre} disabled={cargando}>¡Lo logré! 🎉</button>
-            <button className="btn fantasma" onClick={generarPractica} disabled={cargando}>Dame práctica</button>
-          </div>
-        </>
-      )}
+        <div className="fila" style={{ marginTop: 12 }}>
+          <button className="btn" onClick={logre} disabled={cargando}>¡Lo logré! 🎉</button>
+          <button className="btn fantasma" onClick={generarPractica} disabled={cargando}>Dame práctica</button>
+        </div>
+      </>
     </main>
   );
 }

@@ -157,7 +157,7 @@ export default function Home() {
         <span>👨‍👩‍👧 +2.000 familias</span>
         <span>⭐ 4.9/5 valoración</span>
         <span>🔒 Sin publicidad ni chats externos</span>
-        <span>🎁 7 días gratis</span>
+        <span>🎁 Días de prueba incluidos</span>
       </div>
 
       {/* ====== ESTADÍSTICAS ====== */}
@@ -329,42 +329,24 @@ export default function Home() {
       <section className="seccion" id="planes">
         <h2 className="seccion-titulo">Planes para tu familia</h2>
         <p className="seccion-intro">
-          Empieza con 7 días gratis. Sin permanencia, cancela cuando quieras. Menos que una hora de clases particulares.
+          Ambos planes incluyen días de prueba gratis. Sin permanencia, cancela cuando quieras. Menos que una hora de clases particulares.
         </p>
         <div className="planes">
           <div className="plan">
-            <h4>Prueba</h4>
-            <div className="precio">Gratis<small> /7 días</small></div>
-            <p className="desc">Para conocer cómo funciona sin compromiso.</p>
-            <ul>
-              <li>Tutor guiado paso a paso</li>
-              <li>5 tareas al día</li>
-              <li>Sin tarjeta para empezar</li>
-            </ul>
-            {isSignedIn ? (
-              <Link href="/tutor"><span className="btn fantasma">Ir al tutor</span></Link>
-            ) : (
-              <SignUpButton forceRedirectUrl="/configurar">
-                <button className="btn fantasma">Empezar gratis</button>
-              </SignUpButton>
-            )}
-          </div>
-
-          <div className="plan">
             <h4>Mensual</h4>
             <div className="precio">$39.900<small> /mes</small></div>
-            <p className="desc">Toda la app, mes a mes.</p>
+            <p className="desc">Toda la app. Empieza con días de prueba gratis, cancela cuando quieras.</p>
             <ul>
-              <li>Tareas ilimitadas</li>
+              <li>Tutor ilimitado paso a paso</li>
               <li>Reportes por WhatsApp</li>
               <li>Práctica adaptada por tema</li>
               <li>Todo el currículo 3°–5°</li>
             </ul>
             {isSignedIn ? (
-              <Link href="/api/checkout?plan=mensual"><span className="btn fantasma">Elegir mensual</span></Link>
+              <Link href="/api/checkout?plan=mensual"><span className="btn fantasma">Empezar gratis →</span></Link>
             ) : (
               <SignUpButton forceRedirectUrl="/configurar">
-                <button className="btn fantasma">Elegir mensual</button>
+                <button className="btn fantasma">Empezar gratis</button>
               </SignUpButton>
             )}
           </div>
@@ -373,7 +355,7 @@ export default function Home() {
             <span className="etiqueta">Ahorra 58%</span>
             <h4>Anual</h4>
             <div className="precio">$199.999<small> /año</small></div>
-            <p className="desc">Equivale a $16.667/mes. Paga una vez al año.</p>
+            <p className="desc">Equivale a $16.667/mes. Días de prueba gratis incluidos.</p>
             <ul>
               <li>Todo lo del plan Mensual</li>
               <li>Pagas como 5 meses, usas los 12</li>
@@ -381,7 +363,7 @@ export default function Home() {
               <li>Soporte prioritario</li>
             </ul>
             {isSignedIn ? (
-              <Link href="/api/checkout?plan=anual"><span className="btn coral">Elegir anual →</span></Link>
+              <Link href="/api/checkout?plan=anual"><span className="btn coral">Empezar gratis →</span></Link>
             ) : (
               <SignUpButton forceRedirectUrl="/configurar">
                 <button className="btn coral">Empezar gratis →</button>
@@ -390,7 +372,7 @@ export default function Home() {
           </div>
         </div>
         <p className="nota" style={{ marginTop: 16, textAlign: "center" }}>
-          💳 Pago seguro · Cancela cuando quieras · Garantía de 30 días
+          💳 Pago seguro · Cancela cuando quieras · Días de prueba gratis incluidos
         </p>
       </section>
 

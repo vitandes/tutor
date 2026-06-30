@@ -5,8 +5,6 @@ import { use, useState, useEffect } from "react"
 import { getUnidad } from "@/lib/clases"
 import { notFound } from "next/navigation"
 
-const LECCIONES_GRATIS = 1
-
 const COLORES = [
   { fondo: "#e8f4fd", borde: "#2980b9", texto: "#1a5276", header: "#2980b9" },
   { fondo: "#eafaf1", borde: "#27ae60", texto: "#1e8449", header: "#27ae60" },
@@ -31,14 +29,12 @@ export default function UnidadPage({ params }: { params: Promise<{ grado: string
 
   return (
     <main className="contenedor">
-      {/* Breadcrumb */}
       <div className="fila" style={{ gap: 6, marginBottom: 16, fontSize: 13, color: "var(--gris)" }}>
         <Link href="/clases" className="nota">📚 Clases</Link>
         <span>›</span>
         <span>Unidad {unidad.id}</span>
       </div>
 
-      {/* Header de unidad */}
       <div className="tarjeta" style={{
         background: col.fondo,
         border: `2px solid ${col.borde}`,
@@ -49,16 +45,9 @@ export default function UnidadPage({ params }: { params: Promise<{ grado: string
         gap: 16,
       }}>
         <div style={{
-          width: 64,
-          height: 64,
-          borderRadius: 14,
-          background: "#fff",
-          border: `2px solid ${col.borde}`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 32,
-          flexShrink: 0,
+          width: 64, height: 64, borderRadius: 14, background: "#fff",
+          border: `2px solid ${col.borde}`, display: "flex", alignItems: "center",
+          justifyContent: "center", fontSize: 32, flexShrink: 0,
         }}>
           {unidad.icono}
         </div>
@@ -69,64 +58,52 @@ export default function UnidadPage({ params }: { params: Promise<{ grado: string
         </div>
       </div>
 
-      {/* Aviso free si aplica */}
-      {plan !== null && !esPro && (
-        <div style={{ marginBottom: 16, padding: "10px 14px", background: "var(--marcador)", border: "2px solid var(--tinta)", borderRadius: "var(--radio)", fontSize: 13 }}>
-          Plan gratuito · Solo la primera lección de cada unidad está disponible.{" "}
-          <Link href="/api/checkout?plan=mensual" style={{ color: "var(--coral)", fontWeight: 700 }}>Activar plan →</Link>
-        </div>
-      )}
-
-      {/* Lista de lecciones */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {unidad.lecciones.map((leccion, idx) => {
-          const bloqueada = plan !== null && !esPro && idx >= LECCIONES_GRATIS
+          const bloqueada = plan !== null && !esPro
           return (
-          <Link
-            key={leccion.id}
-            href={`/clases/${grado}/${unidadId}/${leccion.id}`}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 14,
-              background: bloqueada ? "#f5f5f5" : "#fff",
-              border: `2px solid ${bloqueada ? "var(--linea)" : "var(--tinta)"}`,
-              borderRadius: "var(--radio)",
-              padding: "14px 18px",
-              boxShadow: bloqueada ? "none" : "3px 3px 0 var(--tinta)",
-              textDecoration: "none",
-              color: bloqueada ? "var(--gris)" : "var(--tinta)",
-              transition: "transform 0.08s, box-shadow 0.08s",
-              opacity: bloqueada ? 0.7 : 1,
-            }}
-            onMouseEnter={(e) => { if (!bloqueada) { (e.currentTarget as HTMLElement).style.transform = "translate(2px,2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "1px 1px 0 var(--tinta)" } }}
-            onMouseLeave={(e) => { if (!bloqueada) { (e.currentTarget as HTMLElement).style.transform = ""; (e.currentTarget as HTMLElement).style.boxShadow = "3px 3px 0 var(--tinta)" } }}
-          >
-            <div style={{
-              width: 36, height: 36, borderRadius: "50%",
-              background: bloqueada ? "var(--linea)" : col.header,
-              color: "#fff",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontFamily: "var(--display)", fontWeight: 700, fontSize: 15, flexShrink: 0,
-            }}>
-              {bloqueada ? "🔒" : idx + 1}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontFamily: "var(--display)", fontWeight: 600, fontSize: 15, lineHeight: 1.3 }}>
-                {leccion.titulo}
-              </p>
-              <p style={{ fontSize: 12, color: "var(--gris)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {bloqueada ? "Requiere plan activo" : leccion.objetivo}
-              </p>
-            </div>
-            <div style={{ flexShrink: 0, textAlign: "right", fontSize: 12, color: "var(--gris)" }}>
-              {!bloqueada && <div>{leccion.ejercicios.length} ejercicios</div>}
-              <div style={{ fontSize: 18, color: bloqueada ? "var(--gris)" : col.borde, marginTop: 2 }}>
-                {bloqueada ? "🔒" : "›"}
+            <Link
+              key={leccion.id}
+              href={`/clases/${grado}/${unidadId}/${leccion.id}`}
+              style={{
+                display: "flex", alignItems: "center", gap: 14,
+                background: bloqueada ? "#f5f5f5" : "#fff",
+                border: `2px solid ${bloqueada ? "var(--linea)" : "var(--tinta)"}`,
+                borderRadius: "var(--radio)", padding: "14px 18px",
+                boxShadow: bloqueada ? "none" : "3px 3px 0 var(--tinta)",
+                textDecoration: "none",
+                color: bloqueada ? "var(--gris)" : "var(--tinta)",
+                transition: "transform 0.08s, box-shadow 0.08s",
+                opacity: bloqueada ? 0.7 : 1,
+              }}
+              onMouseEnter={(e) => { if (!bloqueada) { (e.currentTarget as HTMLElement).style.transform = "translate(2px,2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "1px 1px 0 var(--tinta)"; } }}
+              onMouseLeave={(e) => { if (!bloqueada) { (e.currentTarget as HTMLElement).style.transform = ""; (e.currentTarget as HTMLElement).style.boxShadow = "3px 3px 0 var(--tinta)"; } }}
+            >
+              <div style={{
+                width: 36, height: 36, borderRadius: "50%",
+                background: bloqueada ? "var(--linea)" : col.header,
+                color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: "var(--display)", fontWeight: 700, fontSize: 15, flexShrink: 0,
+              }}>
+                {bloqueada ? "🔒" : idx + 1}
               </div>
-            </div>
-          </Link>
-        )})}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontFamily: "var(--display)", fontWeight: 600, fontSize: 15, lineHeight: 1.3 }}>
+                  {leccion.titulo}
+                </p>
+                <p style={{ fontSize: 12, color: "var(--gris)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {bloqueada ? "Requiere plan activo" : leccion.objetivo}
+                </p>
+              </div>
+              <div style={{ flexShrink: 0, textAlign: "right", fontSize: 12, color: "var(--gris)" }}>
+                {!bloqueada && <div>{leccion.ejercicios.length} ejercicios</div>}
+                <div style={{ fontSize: 18, color: bloqueada ? "var(--gris)" : col.borde, marginTop: 2 }}>
+                  {bloqueada ? "🔒" : "›"}
+                </div>
+              </div>
+            </Link>
+          )
+        })}
       </div>
 
       <div style={{ marginTop: 24 }}>

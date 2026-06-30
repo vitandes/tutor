@@ -7,25 +7,12 @@ import { createAdminClient } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 
-const LIMITE_GRATIS = 5;
-
-async function getUsoGratuito(userId: string): Promise<number> {
-  const supabase = createAdminClient();
-  const { data } = await supabase
-    .from("progreso_temas")
-    .select("preguntas_totales")
-    .eq("user_id", userId);
-  return data?.reduce((sum, r) => sum + (r.preguntas_totales ?? 0), 0) ?? 0;
-}
-
 export async function POST(req: NextRequest) {
-  // Autenticación
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  // Verificar plan y límite
   const supabase = createAdminClient();
   const { data: perfil } = await supabase
     .from("profiles")
@@ -36,13 +23,7 @@ export async function POST(req: NextRequest) {
   const esPro = perfil?.plan === "mensual" || perfil?.plan === "anual";
 
   if (!esPro) {
-    const uso = await getUsoGratuito(userId);
-    if (uso >= LIMITE_GRATIS) {
-      return NextResponse.json(
-        { error: "limite_alcanzado", uso },
-        { status: 403 }
-      );
-    }
+    return NextResponse.json({ error: "sin_plan" }, { status: 403 });
   }
 
   try {

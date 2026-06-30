@@ -114,8 +114,10 @@ export async function POST(req: Request) {
           if (localStatus === 'active' && finalUserId) {
             const plan = existingSub?.plan ?? 'mensual'
             await supabase.from('profiles').update({ plan }).eq('id', finalUserId)
-          } else if (localStatus === 'canceled' && finalUserId) {
+            console.log(`[MercadoPago Webhook] ✅ profiles.plan → ${plan} for user ${finalUserId}`)
+          } else if ((localStatus === 'canceled' || localStatus === 'paused') && finalUserId) {
             await supabase.from('profiles').update({ plan: 'free' }).eq('id', finalUserId)
+            console.log(`[MercadoPago Webhook] ❌ profiles.plan → free for user ${finalUserId} (${localStatus})`)
           }
         } else {
           console.error('[MercadoPago Webhook] Could not resolve user_id for preapproval', mpPreapprovalId)

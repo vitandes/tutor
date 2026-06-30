@@ -6,9 +6,6 @@ import { getLeccion, getUnidad, getLeccionAnteriorSiguiente } from "@/lib/clases
 import type { Ejercicio } from "@/lib/clases"
 import { notFound } from "next/navigation"
 
-// Primeras N lecciones por unidad que son gratuitas (índice 0-based)
-const LECCIONES_GRATIS = 1
-
 const COLORES = [
   { fondo: "#e8f4fd", borde: "#2980b9", texto: "#1a5276", header: "#2980b9" },
   { fondo: "#eafaf1", borde: "#27ae60", texto: "#1e8449", header: "#27ae60" },
@@ -174,10 +171,8 @@ export default function LeccionPage({
   const col = COLORES[(unidad.id - 1) % COLORES.length]
   const tutorUrl = `/tutor?tema=${encodeURIComponent(leccion.titulo)}&contexto=${encodeURIComponent(`Estoy estudiando: ${leccion.titulo}. ${leccion.concepto_clave}`)}`
 
-  // Determinar si esta lección es de pago
-  const idxLeccion = unidad.lecciones.findIndex((l) => l.id === leccionId)
   const esPro = plan === "mensual" || plan === "anual"
-  const bloqueada = plan !== null && !esPro && idxLeccion >= LECCIONES_GRATIS
+  const bloqueada = plan !== null && !esPro
 
   if (plan === null) {
     return <main className="contenedor"><p className="nota">Cargando…</p></main>
@@ -201,7 +196,7 @@ export default function LeccionPage({
             <strong>{leccion.titulo}</strong> requiere un plan activo.
           </p>
           <p className="nota" style={{ marginBottom: 24 }}>
-            La primera lección de cada unidad es gratuita. Activa tu plan para acceder a todas las lecciones, ejercicios y el tutor ilimitado.
+            Activa tu plan para acceder a todas las lecciones, ejercicios y el tutor. Incluye días de prueba gratis — sin cobro hasta que termine el período.
           </p>
           <Link href="/api/checkout?plan=mensual" className="btn coral" style={{ display: "inline-block", marginBottom: 10 }}>
             Activar plan mensual · $39.900/mes →
