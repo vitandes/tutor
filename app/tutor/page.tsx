@@ -59,7 +59,10 @@ function TutorContent() {
   function elegirTema(id: string, nombre: string) {
     setTemaId(id);
     setTemaNombre(nombre);
-    setMensajes([{ role: "assistant", content: `¡Hola ${perfil?.nombre_hijo ?? ""}! Vamos con ${nombre}. Cuéntame tu ejercicio o tómale una foto. ¿Qué has intentado?` }]);
+    const saludo = id === "libre"
+      ? `¡Hola ${perfil?.nombre_hijo ?? ""}! Cuéntame qué tema o ejercicio necesitas resolver hoy. Puedes escribirlo o tomarle una foto. 📸`
+      : `¡Hola ${perfil?.nombre_hijo ?? ""}! Vamos con ${nombre}. Cuéntame tu ejercicio o tómale una foto. ¿Qué has intentado?`;
+    setMensajes([{ role: "assistant", content: saludo }]);
     setEjercicios([]);
   }
 
@@ -141,19 +144,37 @@ function TutorContent() {
       <main className="contenedor">
         <Link href="/" className="nota">← Inicio</Link>
         <div className="tarjeta" style={{ textAlign: "center", padding: "48px 24px", marginTop: 24 }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
-          <h2 style={{ fontSize: 24, marginBottom: 8 }}>Activa tu plan para empezar</h2>
-          <p className="nota" style={{ marginBottom: 24, maxWidth: 380, margin: "0 auto 24px" }}>
-            El tutor, las clases y el seguimiento de progreso están disponibles con cualquier plan.
-            Incluye días de prueba gratis — sin cobro hasta que termine el período.
+          <div style={{ fontSize: 48, marginBottom: 12 }}>🎁</div>
+          <div style={{
+            display: "inline-block",
+            background: "var(--marcador)",
+            border: "2px solid var(--tinta)",
+            borderRadius: 10,
+            padding: "6px 16px",
+            fontSize: 14,
+            fontWeight: 700,
+            marginBottom: 16,
+          }}>
+            3 días de prueba gratis — sin cobro hasta que terminen
+          </div>
+          <h2 style={{ fontSize: 24, marginBottom: 8 }}>Empieza hoy sin pagar nada</h2>
+          <p className="nota" style={{ maxWidth: 400, margin: "0 auto 28px" }}>
+            Elige un plan, ingresa tu tarjeta y accede a todo: tutor ilimitado, clases del currículo y seguimiento de progreso.
+            <strong> No se hace ningún cobro durante los primeros 3 días.</strong>
           </p>
-          <Link href="/api/checkout?plan=mensual" className="btn coral" style={{ display: "inline-block", marginBottom: 10 }}>
-            Activar plan mensual · $39.900/mes →
-          </Link>
-          <br />
-          <Link href="/api/checkout?plan=anual" className="btn fantasma" style={{ display: "inline-block", marginTop: 8 }}>
-            Plan anual · $199.999/año (ahorra 58%)
-          </Link>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 360, margin: "0 auto" }}>
+            <Link href="/api/checkout?plan=mensual" className="btn coral" style={{ display: "block", padding: "14px 20px" }}>
+              Probar gratis · luego $39.900/mes →
+            </Link>
+            <Link href="/api/checkout?plan=anual" className="btn fantasma" style={{ display: "block", padding: "14px 20px" }}>
+              Probar gratis · luego $199.999/año (ahorra 58%)
+            </Link>
+          </div>
+
+          <p style={{ marginTop: 20, fontSize: 12, color: "var(--gris)" }}>
+            💳 Cancela antes de los 3 días y no pagas nada · Sin permanencia
+          </p>
         </div>
       </main>
     );
@@ -199,6 +220,17 @@ function TutorContent() {
           {temasPorGrado(grado).map((t) => (
             <button key={t.id} className="chip" onClick={() => elegirTema(t.id, t.nombre)}>{t.nombre}</button>
           ))}
+        </div>
+
+        <div style={{ marginTop: 24, borderTop: "2px dashed var(--linea)", paddingTop: 20 }}>
+          <p className="nota" style={{ marginBottom: 12 }}>¿Tu tema no aparece arriba?</p>
+          <button
+            className="btn fantasma"
+            onClick={() => elegirTema("libre", "otro tema")}
+            style={{ width: "100%" }}
+          >
+            📝 Estudiar otro tema con el tutor
+          </button>
         </div>
       </main>
     );

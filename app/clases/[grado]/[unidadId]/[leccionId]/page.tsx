@@ -190,22 +190,36 @@ export default function LeccionPage({
           <span style={{ color: "var(--tinta)" }}>{leccion.titulo}</span>
         </div>
         <div className="tarjeta" style={{ textAlign: "center", padding: "40px 24px" }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
-          <h2 style={{ fontSize: 22, marginBottom: 8 }}>Contenido Pro</h2>
-          <p style={{ fontSize: 15, color: "var(--gris)", marginBottom: 8 }}>
-            <strong>{leccion.titulo}</strong> requiere un plan activo.
+          <div style={{ fontSize: 48, marginBottom: 12 }}>🎁</div>
+          <div style={{
+            display: "inline-block",
+            background: "var(--marcador)",
+            border: "2px solid var(--tinta)",
+            borderRadius: 10,
+            padding: "6px 16px",
+            fontSize: 14,
+            fontWeight: 700,
+            marginBottom: 16,
+          }}>
+            3 días de prueba gratis — sin cobro hasta que terminen
+          </div>
+          <h2 style={{ fontSize: 22, marginBottom: 8 }}>Empieza hoy sin pagar nada</h2>
+          <p style={{ fontSize: 14, color: "var(--gris)", marginBottom: 20, maxWidth: 360, margin: "0 auto 20px" }}>
+            Accede a <strong>{leccion.titulo}</strong> y a todo el currículo con cualquier plan.
+            <strong> No se hace ningún cobro durante los primeros 3 días.</strong>
           </p>
-          <p className="nota" style={{ marginBottom: 24 }}>
-            Activa tu plan para acceder a todas las lecciones, ejercicios y el tutor. Incluye días de prueba gratis — sin cobro hasta que termine el período.
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 340, margin: "0 auto" }}>
+            <Link href="/api/checkout?plan=mensual" className="btn coral" style={{ display: "block", padding: "14px 20px" }}>
+              Probar gratis · luego $39.900/mes →
+            </Link>
+            <Link href="/api/checkout?plan=anual" className="btn fantasma" style={{ display: "block", padding: "14px 20px" }}>
+              Probar gratis · luego $199.999/año (ahorra 58%)
+            </Link>
+          </div>
+          <p style={{ marginTop: 16, fontSize: 12, color: "var(--gris)" }}>
+            💳 Cancela antes de los 3 días y no pagas nada · Sin permanencia
           </p>
-          <Link href="/api/checkout?plan=mensual" className="btn coral" style={{ display: "inline-block", marginBottom: 10 }}>
-            Activar plan mensual · $39.900/mes →
-          </Link>
-          <br />
-          <Link href="/api/checkout?plan=anual" className="btn fantasma" style={{ display: "inline-block", marginTop: 8 }}>
-            Plan anual · $199.999/año (ahorra 58%)
-          </Link>
-          <p style={{ marginTop: 20 }}>
+          <p style={{ marginTop: 16 }}>
             <Link href={`/clases/${grado}/${unidadId}`} className="nota">← Volver a la unidad</Link>
           </p>
         </div>
