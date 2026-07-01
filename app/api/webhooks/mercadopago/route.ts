@@ -8,15 +8,6 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    // Validar clave secreta si está configurada
-    const mpSecret = process.env.MP_WEBHOOK_SECRET
-    if (mpSecret) {
-      const signature = req.headers.get('x-signature') || ''
-      if (signature !== mpSecret) {
-        console.warn('[MercadoPago Webhook] Firma inválida')
-        return new NextResponse('Unauthorized', { status: 401 })
-      }
-    }
 
     const url = new URL(req.url)
 
