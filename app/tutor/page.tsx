@@ -9,7 +9,9 @@ import { MensajeChat } from "@/app/components/MensajeChat";
 
 interface Msg { role: "user" | "assistant"; content: string; img?: string; reintentable?: boolean; }
 interface Ejercicio { enunciado: string; pista: string; }
-interface Perfil { nombre_hijo: string; grado: string; plan: string; onboarding_completado: boolean; }
+interface Perfil { nombre_hijo: string; grado: string; plan: string; onboarding_completado: boolean; imagenes_hoy: number; imagenes_fecha: string | null; }
+
+const LIMITE_FOTOS_DIA = 5;
 
 function TutorContent() {
   const router = useRouter();
@@ -27,6 +29,7 @@ function TutorContent() {
   const fileRef = useRef<HTMLInputElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
   const [ejercicios, setEjercicios] = useState<Ejercicio[]>([]);
+  const [fotosHoy, setFotosHoy] = useState(0);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -37,6 +40,9 @@ function TutorContent() {
         if (!d || !d.onboarding_completado) { router.push("/configurar"); return; }
         setPerfil(d);
         setGrado(d.grado as Grado);
+        // Cargar fotos usadas hoy (resetear si es día nuevo)
+        const hoy = new Date().toISOString().slice(0, 10);
+        setFotosHoy(d.imagenes_fecha === hoy ? (d.imagenes_hoy ?? 0) : 0);
         const temaParam = searchParams.get("tema");
         const contextoParam = searchParams.get("contexto");
         if (temaParam) {
@@ -103,6 +109,20 @@ function TutorContent() {
         }),
       });
       const data = await resp.json();
+
+      // Límite de fotos diarias alcanzado
+      if (resp.status === 429 && data.error === "limite_fotos") {
+        setMensajes((m) => [...m, {
+          role: "assistant",
+          content: `📷 Ya usaste las ${LIMITE_FOTOS_DIA} fotos de hoy. Mañana se renueva el límite. Mientras, puedes escribir el ejercicio con texto y te ayudo igual. ✍️`,
+        }]);
+        setFotosHoy(LIMITE_FOTOS_DIA);
+        return;
+      }
+
+      // Actualizar contador de fotos si vino en la respuesta
+      if (data.fotosHoy !== undefined) setFotosHoy(data.fotosHoy);
+
       const msgs: Msg[] = [];
       if (data.ejercicioExtraido) {
         msgs.push({ role: "assistant", content: `📋 Ejercicio detectado:\n${data.ejercicioExtraido}` });
@@ -281,7 +301,20 @@ function TutorContent() {
         {img && <img src={img.preview} className="thumb" alt="vista previa" />}
         <div className="entrada">
           <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={leerFoto} />
-          <button className="iconbtn" onClick={() => fileRef.current?.click()} title="Foto de la tarea">📷</button>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+            <button
+              className="iconbtn"
+              onClick={() => fileRef.current?.click()}
+              title={fotosHoy >= LIMITE_FOTOS_DIA ? "Límite de fotos alcanzado" : "Foto de la tarea"}
+              disabled={fotosHoy >= LIMITE_FOTOS_DIA}
+              style={{ opacity: fotosHoy >= LIMITE_FOTOS_DIA ? 0.4 : 1 }}
+            >
+              📷
+            </button>
+            <span style={{ fontSize: 10, color: fotosHoy >= LIMITE_FOTOS_DIA ? "var(--coral)" : "var(--gris)", fontWeight: 600, lineHeight: 1 }}>
+              {LIMITE_FOTOS_DIA - fotosHoy}/{LIMITE_FOTOS_DIA}
+            </span>
+          </div>
           <textarea
             rows={1}
             placeholder="Escribe lo que intentaste…"
